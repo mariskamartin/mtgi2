@@ -30,16 +30,16 @@ bootJar {
 }
 
 dependencies {
-	implementation('org.springframework.boot:spring-boot-starter-web')
-	implementation('org.springframework.boot:spring-boot-starter-jdbc')
-	
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("com.h2database:h2")
 
-	implementation('org.codehaus.groovy:groovy')
+	compile('org.codehaus.groovy:groovy')
 	compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
 	compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
 	compile group: 'joda-time', name: 'joda-time', version: '2.10.1'
 
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
-	runtimeOnly('com.h2database:h2')
+//	runtimeOnly('com.h2database:h2')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

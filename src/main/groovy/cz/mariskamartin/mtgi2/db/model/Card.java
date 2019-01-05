@@ -1,14 +1,16 @@
 package cz.mariskamartin.mtgi2.db.model;
 
 import com.google.common.base.MoreObjects;
+import cz.mariskamartin.mtgi2.db.JpaEntityTraceListener;
 
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.UUID;
 
-//@Entity
-//@EntityListeners(JpaEntityTraceListener.class)
-@XmlRootElement
+@Entity
+@EntityListeners(JpaEntityTraceListener.class)
+//@XmlRootElement
 //@Unique(members={"name","foil","rarity","edition"})
 public class Card {
     /**
@@ -18,7 +20,7 @@ public class Card {
         id, name, foil, created, updated, rarity, edition
     }
 
-//    @Id
+    @Id
     private String id;
     private String name;
     private boolean foil;
@@ -32,17 +34,28 @@ public class Card {
 //    @Temporal(TemporalType.DATE)
     private Date updated;
 
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private CardRarity rarity;
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private CardEdition edition;
+
+
+    public static String getIdKey(Card card) {
+        return card.name + "|" + String.valueOf(card.foil) + "|" + card.rarity + "|" + card.edition.getKey();
+    }
+
+    //because of JPA
+    public Card() {}
+
+    public Card(String name, boolean foil, CardRarity rarity, CardEdition edition) {
+        this.name = name;
+        this.foil = foil;
+        this.rarity = rarity;
+        this.edition = edition;
+    }
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -57,16 +70,8 @@ public class Card {
         return created;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
     public Date getUpdated() {
         return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
     }
 
     public CardRarity getRarity() {
@@ -81,11 +86,6 @@ public class Card {
         return edition;
     }
 
-//    @Transient
-    public String getEditionKey() {
-        return edition.getKey();
-    }
-
     public void setEdition(CardEdition edition) {
         this.edition = edition;
     }
@@ -98,15 +98,16 @@ public class Card {
         this.foil = foil;
     }
 
-//    @PrePersist
+    @PrePersist
     private void prePersist() {
         if (id == null || id.isEmpty() || id.equals("0")) {
-            this.id = UUID.randomUUID().toString();
+            this.id = getIdKey(this);
         }
-        created = new Date();
+        created = updated = new Date();
     }
 
-//    @PreUpdate
+
+    @PreUpdate
     private void preUpdate() {
         updated = new Date();
     }
