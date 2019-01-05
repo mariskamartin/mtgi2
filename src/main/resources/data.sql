@@ -1,0 +1,2 @@
+insert into card values(1, 'card_a', false, '2006-05-04 01:02:03', '2006-05-04 01:02:03', 'RARE', 'MAGIC_2015');
+insert into card values(2, 'card b', false, '2006-05-04 01:02:03', '2006-05-04 01:02:03', 'MYTHIC', 'DARKSTEEL');
