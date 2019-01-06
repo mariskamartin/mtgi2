@@ -6,12 +6,12 @@ import cz.mariskamartin.mtgi2.db.JpaEntityTraceListener;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @EntityListeners(JpaEntityTraceListener.class)
-//@XmlRootElement
-//@Unique(members={"name","foil","rarity","edition"})
 public class Card {
     /**
      * As one place for META names
@@ -24,21 +24,16 @@ public class Card {
     private String id;
     private String name;
     private boolean foil;
-//    @Version
-//    private long version;
 
-//    @Column(nullable = false)
-//    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date created;
-//    @Column(nullable = false)
-//    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
     @Enumerated(EnumType.STRING)
     private CardRarity rarity;
     @Enumerated(EnumType.STRING)
     private CardEdition edition;
-
 
     public static String getIdKey(Card card) {
         return card.name + "|" + String.valueOf(card.foil) + "|" + card.rarity + "|" + card.edition.getKey();
@@ -52,6 +47,7 @@ public class Card {
         this.foil = foil;
         this.rarity = rarity;
         this.edition = edition;
+        this.id = getIdKey(this);
     }
 
     public String getId() {

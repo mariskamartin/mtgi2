@@ -2,18 +2,17 @@ package cz.mariskamartin.mtgi2.db.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.MoreObjects;
+import cz.mariskamartin.mtgi2.db.JpaEntityTraceListener;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-@XmlRootElement
-//@Entity
-//@EntityListeners(JpaEntityTraceListener.class)
-//@Unique(members={"card","day","shop"})
+@Entity
+@EntityListeners(JpaEntityTraceListener.class)
 public class DailyCardInfo {
     /**
      * As one place for META names
@@ -22,21 +21,22 @@ public class DailyCardInfo {
         id, price, storeAmount, shop, day, card
     }
 
-//    @Id
+    @Id
     private String id;
 
     private BigDecimal price;
 
     private long storeAmount;
 
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private CardShop shop;
 
 //    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date day;
 
-//    @ManyToOne(cascade=CascadeType.MERGE, optional = false)
-//    @JoinColumn(name = "id", nullable = false, updatable = false)
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name="card_id", nullable = false)
     private Card card;
 
     public DailyCardInfo() {
@@ -113,11 +113,10 @@ public class DailyCardInfo {
                 .toString();
     }
 
-
-//    @PrePersist
+    @PrePersist
     private void prePersist() {
         if (id == null || id.isEmpty() || id.equals("0")) {
-            this.id = UUID.randomUUID().toString();
+            this.id = "DCI-" + UUID.randomUUID().toString();
         }
     }
 }

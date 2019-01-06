@@ -124,6 +124,7 @@ public enum CardEdition {
     PORTAL_THREE_KINGDOMS("PTK", "Portal Three Kingdoms"),
     PROPHECY("PCY", "Prophecy"),
     RAVNICA("RAV", "Ravnica", "Ravnica: City of Guilds"),
+    RAVNICA_ALLEGIANCE("RNA","Ravnica Allegiance"),
     RETURN_TO_RAVNICA("RTR", "Return to Ravnica"),
     RISE_OF_THE_ELDRAZI("ROE", "Rise of the Eldrazi"),
     SAVIORS_OF_KAMIGAWA("SOK", "Saviors of Kamigawa"),

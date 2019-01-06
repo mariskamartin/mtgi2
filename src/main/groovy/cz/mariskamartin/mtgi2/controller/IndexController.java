@@ -1,10 +1,9 @@
 package cz.mariskamartin.mtgi2.controller;
 
+import com.google.common.collect.Lists;
 import cz.mariskamartin.mtgi2.CardService;
 import cz.mariskamartin.mtgi2.db.CardRepository;
-import cz.mariskamartin.mtgi2.db.model.Card;
-import cz.mariskamartin.mtgi2.db.model.CardEdition;
-import cz.mariskamartin.mtgi2.db.model.CardRarity;
+import cz.mariskamartin.mtgi2.db.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping("/")
@@ -33,6 +35,10 @@ public class IndexController {
         return "GET / ... this overview \n" +
                 "\n" +
                 "GET /log-test \n" +
+                "GET /db/init \n" +
+                "GET /db/test \n" +
+                "GET /card?name=CardC \n" +
+                "GET /dci/fetch?name=Watery+Grave \n" +
                 "\n";
     }
 
@@ -47,15 +53,15 @@ public class IndexController {
     @RequestMapping(value = "/db/init", method = RequestMethod.GET)
     public String initDb() {
         // save a couple of customers
-        try {
-            cardRepository.save(new Card("CardD", false, CardRarity.UNCOMMON, CardEdition.ALPHA));
-            cardRepository.save(new Card("CardA", false, CardRarity.COMMON, CardEdition.ALPHA));
-            cardRepository.save(new Card("CardB", false, CardRarity.LAND, CardEdition.MAGIC_2011));
-            cardRepository.save(new Card("CardC", false, CardRarity.RARE, CardEdition.BETA));
-        } catch (Exception e) {
-            log.warn("Not all entries stored. Err: {}", e.getMessage());
-        }
+        cardRepository.save(new Card("CardD", false, CardRarity.UNCOMMON, CardEdition.ALPHA));
+        cardRepository.save(new Card("CardA", false, CardRarity.COMMON, CardEdition.ALPHA));
+        cardRepository.save(new Card("CardB", false, CardRarity.LAND, CardEdition.MAGIC_2011));
+        cardRepository.save(new Card("CardC", false, CardRarity.RARE, CardEdition.BETA));
+        return "done";
+    }
 
+    @RequestMapping(value = "/db/test", method = RequestMethod.GET)
+    public String dbTest() {
         // fetch all customers
         log.info("Customers found with findAll():");
         log.info("-------------------------------");
@@ -82,19 +88,28 @@ public class IndexController {
     }
 
 
-
     @RequestMapping(value = "/card", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Card findCard(@RequestParam("name") String name) {
-        Card card = cardService.findCard(name);
+    public List<Card> findCard(@RequestParam("name") String name) {
+        List<Card> card = cardService.findCard(name);
         log.info("found card = {}", card);
         return card;
     }
 
-    @RequestMapping(value = "/card/fetch", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<Card> fetchCard(@RequestParam("name") String name) throws IOException {
-        List<Card> cards = cardService.fetchCards(name);
+    @RequestMapping(value = "/dci/fetch", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchCard(@RequestParam("name") String name) throws IOException {
+        List<DailyCardInfo> dcis = cardService.fetchCardsByName(name);
+        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
         log.info("fetch cards = {}", cards);
         return cards;
     }
+
+    @RequestMapping(value = "/dci/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> dciTest() throws IOException {
+        List<DailyCardInfo> dcis = Lists.newArrayList(new DailyCardInfo(new Card("CardDCI1", true, CardRarity.SPECIAL, CardEdition.EDITION_5TH), BigDecimal.TEN, 2L, new Date(), CardShop.CERNY_RYTIR));
+        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
+        log.info("fetch cards = {}", cards);
+        return cards;
+    }
+
 
 }
