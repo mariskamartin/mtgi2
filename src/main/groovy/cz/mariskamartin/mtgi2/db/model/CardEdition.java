@@ -123,7 +123,7 @@ public enum CardEdition {
     PORTAL_SECOND_AGE("P02", "Portal Second Age"),
     PORTAL_THREE_KINGDOMS("PTK", "Portal Three Kingdoms"),
     PROPHECY("PCY", "Prophecy"),
-    RAVNICA("RAV", "Ravnica", "Ravnica: City of Guilds"),
+    RAVNICA("RAV", "Ravnica", "Ravnica: City of Guilds", "Guilds of Ravnica"),
     RAVNICA_ALLEGIANCE("RNA","Ravnica Allegiance"),
     RETURN_TO_RAVNICA("RTR", "Return to Ravnica"),
     RISE_OF_THE_ELDRAZI("ROE", "Rise of the Eldrazi"),
@@ -150,6 +150,7 @@ public enum CardEdition {
     WEATHERLIGHT("WTH", "Weatherlight"),
     WORLDWAKE("WWK", "Worldwake"),
     ZENDIKAR("ZEN", "Zendikar"),
+    ZENDIKAR_EXPEDITIONS("ZEX", "Zendikar Expeditions"),
     WHITE_BORDERED("WBBS", "Whitebordered Basic sets"),
     BLACK_BORDERED("BBBS", "Blackbordered Basic Sets"),
     UNKNOWN("???", "Unknown", "Legacy", "Foreign Black Bordered");

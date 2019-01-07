@@ -40,7 +40,12 @@ public class Card {
     }
 
     //because of JPA
-    public Card() {}
+    protected Card() {}
+
+    // for find dci purpose
+    public Card(String cardId) {
+        this.id = cardId;
+    }
 
     public Card(String name, boolean foil, CardRarity rarity, CardEdition edition) {
         this.name = name;

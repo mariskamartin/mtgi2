@@ -8,9 +8,11 @@ import cz.mariskamartin.mtgi2.db.model.CardEdition;
 import cz.mariskamartin.mtgi2.db.model.CardRarity;
 import cz.mariskamartin.mtgi2.db.model.DailyCardInfo;
 import cz.mariskamartin.mtgi2.sniffer.CernyRytirLoader;
+import cz.mariskamartin.mtgi2.sniffer.NajadaLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,10 @@ public class CardService {
     }
 
     public List<DailyCardInfo> fetchCardsByName(String name) throws IOException {
-        return new CernyRytirLoader().sniffByCardName(name);
+        List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
+        dailyCardInfos.addAll(new CernyRytirLoader().sniffByCardName(name));
+        dailyCardInfos.addAll(new NajadaLoader().sniffByCardName(name));
+        return dailyCardInfos;
     }
 
     public List<Card> fetchCards(String name) throws IOException {
@@ -56,11 +61,7 @@ public class CardService {
         return cards;
     }
 
-
-
     public Collection<Card> saveCardsIntoDb(List<DailyCardInfo> cardList) {
-//        DailyCardInfoDao dciDao = new DailyCardInfoDao(getEm());
-//        EntityTransaction tx = getEm().getTransaction();
         Map<String, Card> cacheCardsMap = new HashMap<String, Card>();
         Map<String, Card> managedCardsMap = new HashMap<String, Card>();
         try {
@@ -74,18 +75,14 @@ public class CardService {
                 while (tryToSave) {
                     tryToSave = false;
                     try {
-//                        tx.begin();
                         //vlozit referenci z cache
                         if (cacheCardsMap.containsKey(Card.getIdKey(dailyCardInfo.getCard()))) {
                             dailyCardInfo.setCard(cacheCardsMap.get(Card.getIdKey(dailyCardInfo.getCard())));
                         }
-//                        Card card = cardRepository.save(dailyCardInfo.getCard());
-//                        dailyCardInfo.setCard(card);
                         dailyCardInfoRepository.save(dailyCardInfo);
-//                        dailyCardInfo = dciDao.update(dailyCardInfo);
-//                        tx.commit();
-                    } catch (RollbackException e) {
-                        if (e.getMessage().contains("Unique constraint")) {
+                    } catch (DataIntegrityViolationException e) {
+                        // speedup in storing, act only during constraint violation
+                        if (e.getMessage().contains("ConstraintViolationException")) {
                             if (e.getMessage().contains("DailyCardInfo")) {
                                 // pokud se nepovede vlozit kvuli unique dci
                                 if (log.isTraceEnabled()) {
@@ -107,9 +104,6 @@ public class CardService {
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-//            if (tx.isActive()) {
-//                tx.rollback();
-//            }
         }
         return managedCardsMap.values();
     }

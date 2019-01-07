@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MTG Inventory">
+    <meta name="author" content="Mariska Martin">
+
+    <title>MTG Inventory v2.0.0</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/lib/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- Load c3.css -->
+    <link href="/lib/c3/c3.css" rel="stylesheet" type="text/css">
+    <!-- Load pnotify.css -->
+    <link href="/lib/pnotify/pnotify.custom.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="cards-form1">
+                <div class="form-group">
+                    <label for="findInput">Card:</label>
+                    <input placeholder="card name?" id="findInput"/>
+                    <button id="findCardButton" type="submit" class="btn btn-success btn-sm">Find card</button>
+                    <button id="fetchCardButton" type="button" class="btn btn-info btn-sm">Fetch card from shops</button>
+                    <br />
+                    <label for="findInput">Edition:</label>
+                    <input placeholder="edition name?" id="editionInput"/>
+                    <button id="findEditionButton" type="button" class="btn btn-info btn-sm">Fetch by edition</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12">
+            <div id="cards-table1" class="table-responsive">
+                <table class="table table-striped table-condensed table-bordered center-table">
+                    <thead>
+                    <tr>
+                        <th>Card</th>
+                        <th>ID</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cards-tbody1">
+                    <!--<tr>-->
+                        <!--<td>Some card</td>-->
+                        <!--<td>Some ID</td>-->
+                    <!--</tr>-->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!--<h1>Charts</h1>-->
+        <!--<div id="cardDetail" class="col-md-12">-->
+            <!--<h1>Card price history</h1>-->
+            <!--<div id="priceChart"></div>-->
+        <!--</div>-->
+        <div id="charts"></div>
+    </div>
+</div>
+<!-- /.container -->
+
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type='text/javascript' src="/lib/jquery-1.8.3.js"></script>
+<script type='text/javascript' src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<!-- Load d3.js and c3.js -->
+<script src="/lib/c3/d3.min.js" charset="utf-8"></script>
+<script src="/lib/c3/c3.min.js"></script>
+<script src="/js/utils.js"></script>
+
+<script>
+
+function Card(pojo) {
+    var self = this;
+    self.id = pojo.id;
+    self.name = pojo.name;
+    self.rarity = pojo.rarity;
+    self.edition = pojo.edition;
+    self.foil = pojo.foil;
+    self.storeAmount = pojo.storeAmount;
+    // others helps
+    // self.hrefDetail = PAGES_URLS.DETAIL+"/" + pojo.id;
+    self.editionKey = pojo.editionKey;
+    self.foilTxt = pojo.foil ? "FOIL" : "";
+    self.foilImg = (pojo.foil ? " " + utils.icons.star : "");
+    self.crLink = "<a href=\"javascript:utils.links.openCernyRytir('" + this.name + "');\">Černý Rytíř</a>";
+    self.tolarieLink = "<a href=\"javascript:utils.links.openTolarie('" + this.name + "');\">Tolarie</a>";
+    self.magicCardsLink = "<a href=\"javascript:utils.links.openMagicCards('" + this.name + "');\">MagicCards</a>";
+    if (self.name && self.name !== "UNKNOWN") {
+        self.img = "<img src='http://cdn.manaclash.com/images/cards/210x297/" + this.editionKey + "/"
+        + this.name.replace(/ /g, "-").replace(/[,'´]/g, "").toLowerCase() + ".jpg' class='img-thumbnail'></img>";
+    }
+}
+Card.EMPTY = new Card({
+    id : 0,
+    name : "UNKNOWN",
+    price : 0,
+    storeAmount : "",
+    rarity : "UNKNOWN",
+    edition : "UNKNOWN",
+    editionKey : "UNKNOWN",
+    foil : false
+});
+/**
+ *
+ * @param pojo
+ */
+function CardMovement(pojo) {
+    var self = this;
+    self.cardPojo = pojo.card;
+    self.name = pojo.card.name;
+    self.rarity = pojo.card.rarity;
+    self.edition = pojo.card.edition;
+    self.shop = pojo.shop;
+    self.gainPrice = pojo.gainPrice;
+    self.gainPercentage = pojo.gainPercentage > 0 ? "+" + pojo.gainPercentage.toFixed(2) + " %" : pojo.gainPercentage.toFixed(2) + " %";
+    self.oldPrice = pojo.oldPrice;
+    self.newPrice = pojo.newPrice;
+    // others helps
+    // self.hrefDetail = PAGES_URLS.DETAIL+"/" + pojo.card.id;
+    self.gainStatus = pojo.gainPercentage > 0 ? "success" : "danger";
+    self.foilImg = (pojo.card.foil ? " " + utils.icons.star : "");
+    self.info = self.edition;
+}
+
+// MVVM for this html
+function PageViewModel () {
+    var self = this;
+
+    // /**
+    //  * Process action after render template
+    //  * @param elements - created DOM elements
+    //  * @param viewModel
+    //  */
+    // self.afterRenderActiveTemplate = function(elements, viewModel) {
+    //     if(!viewModel.chartData){
+    //         viewModel.chartData = {
+    //             x : ['x1', '2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04', '2015-01-05'],
+    //             data: ['data1', Math.random()*60, Math.random()*60, Math.random()*15,42,12]
+    //         }
+    //     }
+    //     //vyrobeni grafu v DOM
+    //     var chart = c3.generate({
+    //         bindto: '#priceChart',
+    //         data : {
+    //             xs : {
+    //                 data1: "x1"
+    //             },
+    //             columns : [ viewModel.chartData.x, viewModel.chartData.data ]
+    //         },
+    //         axis : {
+    //             x : {
+    //                 type : 'timeseries',
+    //                 tick : {
+    //                     format : '%d.%m.%Y'
+    //                 }
+    //             }
+    //         },
+    //         transition: {
+    //             duration: 150
+    //         }
+    //     });
+    //    chart.load({
+    //        xs : {
+    //            data1: "x1"
+    //        },
+    //        columns : [ viewModel.chartData.x, viewModel.chartData.data ]
+    //    });
+    //    console.log("dom done");
+    // };
+
+    self.populateCardDetail = function(card) {
+        utils.json.get({
+            url : './rest/dci/' + card.id,
+            success : function(result) {
+                console.log(["fetch dcis", this, result]);
+                // var chartId = "pc-1";
+                var chartId = "pc-" + card.id.split('|').join('').split(' ').join('');
+
+                //when not exists
+                if ( $('#' + chartId).length === 0) {
+                    $( "#charts" ).append( "<div class=\"col-md-12\" id=\"div-"+card.id+"\"><h1>"+card.id+"</h1><div id=\"" + chartId + "\"></div></div>" );
+                }
+
+                var data = {};
+                result.forEach(function(item) {
+                    data[item.shop] = data[item.shop] || {
+                        x : [ 'x'+item.shop ],
+                        xs : {},
+                        values : [ item.shop ]
+                    };
+                    data[item.shop].xs[item.shop] = data[item.shop].x[0];
+                    // console.log(data);
+                    data[item.shop].x.push(item.dayTxt);
+                    data[item.shop].values.push(item.price);
+                    data[item.shop].storeDay = item.dayTxt;
+                    data[item.shop].storeAmount = item.storeAmount;
+                });
+
+                var chart = c3.generate({
+                    bindto: '#' + chartId,
+                    data : {
+                        xs : {},
+                        columns : []
+                    },
+                    axis : {
+                        x : {
+                            type : 'timeseries',
+                            tick : {
+                                format : '%d.%m.%Y'
+                            }
+                        }
+                    },
+                    transition: {
+                        duration: 150
+                    }
+                });
+
+                // var txtSkladem = self.cardDetail().storeAmount() ? "<br />" : "";
+                for ( var shop in data) {
+                    // txtSkladem = txtSkladem ? txtSkladem + "<br />" : txtSkladem;
+                    // txtSkladem = txtSkladem + data[shop].storeDay + " - " + shop + " - " + data[shop].storeAmount + " ks";
+
+                    chart.load({
+                        xs : data[shop].xs,
+                        columns : [ data[shop].x, data[shop].values ]
+                    });
+                }
+                // self.cardDetail().storeAmount(txtSkladem);
+                // document.getElementById("cardDetail").scrollIntoView(true);
+            }
+        });
+    };
+}
+
+var pageViewModel = new PageViewModel();
+
+
+$( document ).ready(function() {
+    console.log( "ready!" );
+    // pageViewModel.afterRenderActiveTemplate(document, pageViewModel);
+});
+
+$( "#findCardButton" ).click(function(e) {
+    e.preventDefault();
+    console.log( "Handler for .click() called." );
+    var text = $('#findInput').val();
+    utils.json.get({
+        url : '/rest/cards/find/' + text,
+        success : function(result) {
+            console.log(["find cards",this, result]);
+            var tbody = $( "#cards-tbody1" );
+            tbody.empty();
+            result.forEach(function(item) {
+                console.log(new Card(item));
+                tbody.append( "<tr><td>"+item.name+"</td><td>"+item.id+"</td></tr>" );
+            });
+
+            $("div#cards-table1 > table > tbody > tr").click(function() {
+                var cardId = $(this).find("td").eq(1).html();
+                utils.json.get({
+                    url : '/rest/cards/' + cardId,
+                    success : function(result) {
+                        console.log(["get card",this, result]);
+                        pageViewModel.populateCardDetail(new Card(result));
+                    }
+                });
+            });
+
+        }
+    });
+});
+
+$( "#fetchCardButton" ).click(function(e) {
+    e.preventDefault();
+    console.log( "Handler for fetchCardButton .click() called." );
+    var text = $('#findInput').val();
+    utils.json.get({
+        url : '/rest/dci/fetch/' + text,
+        success : function(result) {
+            console.log(["fetch cards",this, result]);
+            // result.forEach(function(item) {
+            // console.log(new Card(item));
+            // self.cards.push(new Card(item));
+            // });
+            // pageViewModel.populateCardDetail(new Card(result[0]));
+        }
+    });
+});
+
+</script>
+</body>
+</html>

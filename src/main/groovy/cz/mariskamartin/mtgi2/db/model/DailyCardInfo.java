@@ -31,25 +31,31 @@ public class DailyCardInfo {
     @Enumerated(EnumType.STRING)
     private CardShop shop;
 
-//    @Temporal(TemporalType.DATE)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
+//    @Temporal(TemporalType.TIMESTAMP)
     private Date day;
 
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="card_id", nullable = false)
     private Card card;
 
+    public static String getIdKey(DailyCardInfo dailyCardInfo) {
+        String day = new SimpleDateFormat("yyyy-MM-dd").format(dailyCardInfo.day);
+        return "DCI|" + dailyCardInfo.shop + "|" + day + "|" + dailyCardInfo.getCard().getId();
+    }
+
     public DailyCardInfo() {
         // TODO Auto-generated constructor stub
     }
 
-    public DailyCardInfo(Card card, BigDecimal price, long storeAmount, Date date, CardShop shop) {
+    public DailyCardInfo(Card card, BigDecimal price, long storeAmount, Date date, CardShop shop, String id) {
         super();
         this.shop = shop;
         this.card = card;
         this.price = price;
         this.storeAmount = storeAmount;
         this.setDay(date);
+        this.id = id;
     }
 
     @XmlTransient
@@ -116,7 +122,8 @@ public class DailyCardInfo {
     @PrePersist
     private void prePersist() {
         if (id == null || id.isEmpty() || id.equals("0")) {
-            this.id = "DCI-" + UUID.randomUUID().toString();
+//            this.id = "DCI-" + UUID.randomUUID().toString();
+            this.id = getIdKey(this);
         }
     }
 }
