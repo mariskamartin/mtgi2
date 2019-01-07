@@ -46,6 +46,12 @@ public class CardService {
         return dailyCardInfos;
     }
 
+    public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) throws IOException {
+        List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
+        dailyCardInfos.addAll(new CernyRytirLoader().sniffByEdition(edition));
+        return dailyCardInfos;
+    }
+
     public List<Card> fetchCards(String name) throws IOException {
         List<DailyCardInfo> dailyCardInfos = new CernyRytirLoader().sniffByCardName(name);
         LinkedList<Card> cards = Lists.newLinkedList();
@@ -79,6 +85,7 @@ public class CardService {
                         if (cacheCardsMap.containsKey(Card.getIdKey(dailyCardInfo.getCard()))) {
                             dailyCardInfo.setCard(cacheCardsMap.get(Card.getIdKey(dailyCardInfo.getCard())));
                         }
+//                        dailyCardInfo.setCard(cardRepository.save(dailyCardInfo.getCard()));
                         dailyCardInfoRepository.save(dailyCardInfo);
                     } catch (DataIntegrityViolationException e) {
                         // speedup in storing, act only during constraint violation

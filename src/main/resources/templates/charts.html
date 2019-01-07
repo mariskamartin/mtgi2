@@ -29,12 +29,12 @@
                 <div class="form-group">
                     <label for="findInput">Card:</label>
                     <input placeholder="card name?" id="findInput"/>
-                    <button id="findCardButton" type="submit" class="btn btn-success btn-sm">Find card</button>
+                    <button id="findCardButton" type="button" class="btn btn-success btn-sm">Find card</button>
                     <button id="fetchCardButton" type="button" class="btn btn-info btn-sm">Fetch card from shops</button>
                     <br />
-                    <label for="findInput">Edition:</label>
+                    <label for="editionInput">Edition:</label>
                     <input placeholder="edition name?" id="editionInput"/>
-                    <button id="findEditionButton" type="button" class="btn btn-info btn-sm">Fetch by edition</button>
+                    <button id="fetchEditionButton" type="button" class="btn btn-info btn-sm">Fetch by edition</button>
                 </div>
             </form>
         </div>
@@ -72,6 +72,8 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script type='text/javascript' src="/lib/jquery-1.8.3.js"></script>
 <script type='text/javascript' src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script type='text/javascript' src="/lib/pnotify/pnotify.custom.min.js"></script>
+
 <!-- Load d3.js and c3.js -->
 <script src="/lib/c3/d3.min.js" charset="utf-8"></script>
 <script src="/lib/c3/c3.min.js"></script>
@@ -136,48 +138,6 @@ function CardMovement(pojo) {
 function PageViewModel () {
     var self = this;
 
-    // /**
-    //  * Process action after render template
-    //  * @param elements - created DOM elements
-    //  * @param viewModel
-    //  */
-    // self.afterRenderActiveTemplate = function(elements, viewModel) {
-    //     if(!viewModel.chartData){
-    //         viewModel.chartData = {
-    //             x : ['x1', '2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04', '2015-01-05'],
-    //             data: ['data1', Math.random()*60, Math.random()*60, Math.random()*15,42,12]
-    //         }
-    //     }
-    //     //vyrobeni grafu v DOM
-    //     var chart = c3.generate({
-    //         bindto: '#priceChart',
-    //         data : {
-    //             xs : {
-    //                 data1: "x1"
-    //             },
-    //             columns : [ viewModel.chartData.x, viewModel.chartData.data ]
-    //         },
-    //         axis : {
-    //             x : {
-    //                 type : 'timeseries',
-    //                 tick : {
-    //                     format : '%d.%m.%Y'
-    //                 }
-    //             }
-    //         },
-    //         transition: {
-    //             duration: 150
-    //         }
-    //     });
-    //    chart.load({
-    //        xs : {
-    //            data1: "x1"
-    //        },
-    //        columns : [ viewModel.chartData.x, viewModel.chartData.data ]
-    //    });
-    //    console.log("dom done");
-    // };
-
     self.populateCardDetail = function(card) {
         utils.json.get({
             url : './rest/dci/' + card.id,
@@ -240,6 +200,25 @@ function PageViewModel () {
             }
         });
     };
+
+    self.populateCardTable = function(cardsPojo){
+        var tbody = $( "#cards-tbody1" );
+        tbody.empty();
+        cardsPojo.forEach(function(item) {
+            tbody.append( "<tr><td>"+item.name+"</td><td>"+item.id+"</td></tr>" );
+        });
+
+        $("div#cards-table1 > table > tbody > tr").click(function() {
+            var cardId = $(this).find("td").eq(1).html();
+            utils.json.get({
+                url : '/rest/cards/' + cardId,
+                success : function(result) {
+                    console.log(["get card",this, result]);
+                    pageViewModel.populateCardDetail(new Card(result));
+                }
+            });
+        });
+    }
 }
 
 var pageViewModel = new PageViewModel();
@@ -250,32 +229,14 @@ $( document ).ready(function() {
     // pageViewModel.afterRenderActiveTemplate(document, pageViewModel);
 });
 
-$( "#findCardButton" ).click(function(e) {
-    e.preventDefault();
+$( "#findCardButton" ).click(function() {
     console.log( "Handler for .click() called." );
     var text = $('#findInput').val();
     utils.json.get({
         url : '/rest/cards/find/' + text,
         success : function(result) {
             console.log(["find cards",this, result]);
-            var tbody = $( "#cards-tbody1" );
-            tbody.empty();
-            result.forEach(function(item) {
-                console.log(new Card(item));
-                tbody.append( "<tr><td>"+item.name+"</td><td>"+item.id+"</td></tr>" );
-            });
-
-            $("div#cards-table1 > table > tbody > tr").click(function() {
-                var cardId = $(this).find("td").eq(1).html();
-                utils.json.get({
-                    url : '/rest/cards/' + cardId,
-                    success : function(result) {
-                        console.log(["get card",this, result]);
-                        pageViewModel.populateCardDetail(new Card(result));
-                    }
-                });
-            });
-
+            pageViewModel.populateCardTable(result);
         }
     });
 });
@@ -288,6 +249,24 @@ $( "#fetchCardButton" ).click(function(e) {
         url : '/rest/dci/fetch/' + text,
         success : function(result) {
             console.log(["fetch cards",this, result]);
+            pageViewModel.populateCardTable(result);
+            // result.forEach(function(item) {
+            // console.log(new Card(item));
+            // self.cards.push(new Card(item));
+            // });
+            // pageViewModel.populateCardDetail(new Card(result[0]));
+        }
+    });
+});
+
+$( "#fetchEditionButton" ).click(function() {
+    console.log( "Handler for fetchEditionButton .click() called." );
+    var text = $('#editionInput').val();
+    utils.json.get({
+        url : '/rest/dci/fetch/edition/' + text,
+        success : function(result) {
+            console.log(["fetch cards by edition",this, result]);
+            pageViewModel.populateCardTable(result);
             // result.forEach(function(item) {
             // console.log(new Card(item));
             // self.cards.push(new Card(item));

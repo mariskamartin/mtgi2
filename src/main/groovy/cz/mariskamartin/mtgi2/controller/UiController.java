@@ -50,9 +50,9 @@ public class UiController {
         return "index2";
     }
 
-    @GetMapping("/charts")
-    public String charts(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
+    @GetMapping("/")
+    public String charts(Model model) {
+        model.addAttribute("name", "test");
         return "charts";
     }
 

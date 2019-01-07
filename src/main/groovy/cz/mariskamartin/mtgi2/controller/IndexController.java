@@ -114,6 +114,15 @@ public class IndexController {
         return cards;
     }
 
+    @RequestMapping(value = "/dci/fetch/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchDciByEdition(@PathVariable("name") String name) throws IOException {
+        List<DailyCardInfo> dcis = cardService.fetchCardsByEdition(CardEdition.valueFromName(name));
+        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
+        log.info("fetch cards = {}", cards);
+        return cards;
+    }
+
+
     @RequestMapping(value = "/dci/{card-id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<DailyCardInfo> findDci(@PathVariable("card-id") String cardId) throws IOException {
 //        List<DailyCardInfo> byCardId = dailyCardInfoRepository.findByCardId(cardId);
