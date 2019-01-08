@@ -91,6 +91,8 @@ public class Card {
         this.edition = edition;
     }
 
+    public String getEditionKey() { return edition.getKey(); }
+
     public boolean isFoil() {
         return foil;
     }
