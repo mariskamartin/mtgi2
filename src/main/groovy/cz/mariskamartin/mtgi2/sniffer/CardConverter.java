@@ -25,15 +25,12 @@ public final class CardConverter {
     }
 
     public static Card valueOfTolarieElement(Element element) {
-//        Card c = new Card();
-//        Elements innerValues = element.children();
-//        String name = innerValues.get(0).children().get(0).text().trim();
-//        c.setFoil(name.contains(FOIL_TOLARIE));
-//        c.setName(name.replaceAll(Pattern.quote(FOIL_TOLARIE), "").trim());
-//        c.setRarity(CardRarity.valueFrom(innerValues.get(3).text().trim().toUpperCase()));
-//        c.setEdition(CardEdition.valueFromName(innerValues.get(4).text().trim()));
-//        return c;
-        throw new UnsupportedOperationException();
+        Elements innerValues = element.children();
+        String name = innerValues.get(0).children().get(0).text().trim();
+        return new Card(name.replaceAll(Pattern.quote(FOIL_TOLARIE), "").trim(),
+                name.contains(FOIL_TOLARIE),
+                CardRarity.valueFrom(innerValues.select("a[data-tooltip]").attr("data-tooltip").toUpperCase()),
+                CardEdition.valueFromName(innerValues.get(4).text().trim()));
     }
 
     public static Card valueOfCernyRytirElement(Element nameE, Element ediceTypE, Element dataE) {

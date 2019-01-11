@@ -1,26 +1,24 @@
 package cz.mariskamartin.mtgi2;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import cz.mariskamartin.mtgi2.db.CardRepository;
 import cz.mariskamartin.mtgi2.db.DailyCardInfoRepository;
-import cz.mariskamartin.mtgi2.db.model.Card;
-import cz.mariskamartin.mtgi2.db.model.CardEdition;
-import cz.mariskamartin.mtgi2.db.model.CardRarity;
-import cz.mariskamartin.mtgi2.db.model.DailyCardInfo;
+import cz.mariskamartin.mtgi2.db.model.*;
 import cz.mariskamartin.mtgi2.sniffer.CernyRytirLoader;
 import cz.mariskamartin.mtgi2.sniffer.NajadaLoader;
+import cz.mariskamartin.mtgi2.sniffer.TolarieLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.RollbackException;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class CardService {
@@ -28,43 +26,56 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final DailyCardInfoRepository dailyCardInfoRepository;
+    private final ExecutorService executorService;
 
     @Autowired
-    public CardService(CardRepository cardRepository, DailyCardInfoRepository dailyCardInfoRepository) {
+    public CardService(CardRepository cardRepository, DailyCardInfoRepository dailyCardInfoRepository, @Qualifier("fixedThreadPool") ExecutorService executorService) {
         this.cardRepository = cardRepository;
         this.dailyCardInfoRepository = dailyCardInfoRepository;
+        this.executorService = executorService;
     }
 
     public List<Card> findCard(String name) {
-        return cardRepository.findByName(name);
+        return cardRepository.findByNameContaining(name);
     }
 
     public List<DailyCardInfo> fetchCardsByName(String name) throws IOException {
         List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
-        dailyCardInfos.addAll(new CernyRytirLoader().sniffByCardName(name));
-        dailyCardInfos.addAll(new NajadaLoader().sniffByCardName(name));
+        List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
+//        futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByCardName(name)));
+//        futures.add(executorService.submit(() -> new NajadaLoader().sniffByCardName(name)));
+        futures.add(executorService.submit(() -> new TolarieLoader().sniffByCardName(name)));
+        waitForDci(dailyCardInfos, futures);
         return dailyCardInfos;
     }
 
-    public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) throws IOException {
+    public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) {
         List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
-        dailyCardInfos.addAll(new CernyRytirLoader().sniffByEdition(edition));
+        List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
+        if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.CERNY_RYTIR, edition) == 0 ) {
+            futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByEdition(edition)));
+        }
+        if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.TOLARIE, edition) == 0 ) {
+            futures.add(executorService.submit(() -> new TolarieLoader().sniffByEdition(edition)));
+        }
+        waitForDci(dailyCardInfos, futures);
         return dailyCardInfos;
     }
 
-    public List<Card> fetchCards(String name) throws IOException {
-        List<DailyCardInfo> dailyCardInfos = new CernyRytirLoader().sniffByCardName(name);
-        LinkedList<Card> cards = Lists.newLinkedList();
-        for (DailyCardInfo dci : dailyCardInfos) {
-            cards.add(dci.getCard());
+    //    @Scheduled(cron = "0 0 10 * * *") //each day in 10.00
+    public List<Card> fetchAllManagedEditions() {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        long editionProcessedCount = 0;
+        List<Card> allCards = new ArrayList<>();
+
+        Collection<CardEdition> managedEditions = ManagedCardEditions.instance.getManagedEditions();
+        for (CardEdition cardEdition : managedEditions) {
+            allCards.addAll(saveCardsIntoDb(fetchCardsByEdition(cardEdition)));
+            editionProcessedCount++;
+            log.debug("fetching processed {} ({}/{})  ", cardEdition.getName(), editionProcessedCount, managedEditions.size());
         }
-
-//        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(cards.toArray());
-//        int[] updateCounts = namedParameterJdbcTemplate.batchUpdate(
-//                "INSERT INTO CARD (name, foil, created, updated, rarity, edition) VALUES (:name, :foil, :created, :updated, :rarity, :edition)", batch);
-//        log.info("insert count = {}", updateCounts);
-
-        return cards;
+        log.info("download editions elapsed time " + stopwatch.stop().elapsed(TimeUnit.MINUTES) + " minutes");
+        return allCards;
     }
 
     public Collection<Card> saveCardsIntoDb(List<DailyCardInfo> cardList) {
@@ -76,7 +87,6 @@ public class CardService {
                 if (dailyCardInfo.getCard().getRarity().equals(CardRarity.UNKNOWN) || dailyCardInfo.getCard().getEdition().equals(CardEdition.UNKNOWN)) {
                     continue;
                 }
-
                 boolean tryToSave = true;
                 while (tryToSave) {
                     tryToSave = false;
@@ -114,4 +124,15 @@ public class CardService {
         }
         return managedCardsMap.values();
     }
+
+    private void waitForDci(List<DailyCardInfo> dailyCardInfos, List<Future<List<DailyCardInfo>>> futures) {
+        for (Future<List<DailyCardInfo>> future : futures) {
+            try {
+                dailyCardInfos.addAll(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                log.warn(e.getMessage());
+            }
+        }
+    }
+
 }

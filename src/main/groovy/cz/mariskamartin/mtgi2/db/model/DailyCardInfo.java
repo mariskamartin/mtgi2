@@ -58,6 +58,17 @@ public class DailyCardInfo {
         this.id = id;
     }
 
+    public DailyCardInfo(Card card, BigDecimal price, long storeAmount, Date date, CardShop shop) {
+        super();
+        this.shop = shop;
+        this.card = card;
+        this.price = price;
+        this.storeAmount = storeAmount;
+        this.setDay(date);
+        this.id = getIdKey(this);
+    }
+
+
     @XmlTransient
     @JsonIgnore
     public Card getCard() {

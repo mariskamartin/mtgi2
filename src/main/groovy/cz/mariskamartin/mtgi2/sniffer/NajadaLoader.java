@@ -54,7 +54,7 @@ public class NajadaLoader implements ISniffer {
                 Elements innerValues = element.children();
                 long skladem = Long.parseLong(innerValues.select("div.stateNew").select("span").get(2).text().trim());
                 long cena = Long.parseLong(innerValues.select("div.stateNew").select("span").get(0).text().replace(" ", "").trim());
-                DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.NAJADA, null);
+                DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.NAJADA);
                 builder.add(dci);
             } catch (NumberFormatException e) {
                 log.warn("NumberFormatException for card: {}", card);

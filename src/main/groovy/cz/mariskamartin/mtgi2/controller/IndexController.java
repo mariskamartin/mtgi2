@@ -105,12 +105,16 @@ public class IndexController {
         return card.get();
     }
 
+    @RequestMapping(value = "/cards/fetch/managed/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchManaged() throws IOException {
+        List<Card> cards = cardService.fetchAllManagedEditions();
+        return cards;
+    }
 
     @RequestMapping(value = "/dci/fetch/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Collection<Card> fetchCard(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByName(name);
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
-        log.info("fetch cards = {}", cards);
         return cards;
     }
 
@@ -118,7 +122,6 @@ public class IndexController {
     public Collection<Card> fetchDciByEdition(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByEdition(CardEdition.valueFromName(name));
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
-        log.info("fetch cards = {}", cards);
         return cards;
     }
 
