@@ -75,7 +75,7 @@ public class TolarieLoader implements ISniffer {
     private Document fetchFromTolarieKusovky(String findString) throws IOException {
         String urlRequest = "http://www.tolarie.cz/koupit_karty/?name=" + findString.replace(" ", "+")
                 + "&o=name&od=a";
-        Document doc = Jsoup.connect(urlRequest).get();
+        Document doc = Jsoup.connect(urlRequest).timeout(5000).get();
         return doc;
     }
 
@@ -85,7 +85,7 @@ public class TolarieLoader implements ISniffer {
         }
         String urlRequest = "http://www.tolarie.cz/koupit_karty/?name=&edition=" + edice
                 + "&o=name&od=a&foil=False&stored=False&p=" + page;
-        Document doc = Jsoup.connect(urlRequest).get();
+        Document doc = Jsoup.connect(urlRequest).timeout(5000).get();
         return doc;
 // return Jsoup.parse(new File("C://tolarie.html"), "utf-8"); //for DEBUG
 // return Jsoup.parse(new File("C://tolarie.html"), "windows-1250"); // for DEBUG

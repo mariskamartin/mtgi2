@@ -42,8 +42,8 @@ public class CardService {
     public List<DailyCardInfo> fetchCardsByName(String name) throws IOException {
         List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
         List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
-//        futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByCardName(name)));
-//        futures.add(executorService.submit(() -> new NajadaLoader().sniffByCardName(name)));
+        futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByCardName(name)));
+        futures.add(executorService.submit(() -> new NajadaLoader().sniffByCardName(name)));
         futures.add(executorService.submit(() -> new TolarieLoader().sniffByCardName(name)));
         waitForDci(dailyCardInfos, futures);
         return dailyCardInfos;
@@ -51,6 +51,7 @@ public class CardService {
 
     public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) {
         List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
+
         List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
         if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.CERNY_RYTIR, edition) == 0 ) {
             futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByEdition(edition)));

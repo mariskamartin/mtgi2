@@ -27,11 +27,11 @@ public enum ManagedCardEditions {
         add(CardEdition.MODERN_MASTERS, "edition_Modern_Masters",null);
         add(CardEdition.MODERN_MASTERS_2015, "edition_Modern_Masters_2015",null);
         add(CardEdition.MASTERS_25, "edition_M25",null);
-        add(CardEdition.MAGIC_2019, "M15", "16"));
+        add(CardEdition.MAGIC_2019, "edition_M19", null);
 
-//        managed.add(new EditionInfo(CardEdition.JOURNEY_INTO_NYX, "Journey_Into_Nyx","164"));
-//        managed.add(new EditionInfo(CardEdition.BORN_OF_THE_GODS, "Born_of_Gods","163"));
-//        managed.add(new EditionInfo(CardEdition.THEROS, "Theros","162"));
+        add(CardEdition.JOURNEY_INTO_NYX, "edition_Journey_Into_Nyx","164");
+        add(CardEdition.BORN_OF_THE_GODS, "edition_Born_of_Gods","163");
+        add(CardEdition.THEROS, "edition_Theros","162");
 //        managed.add(new EditionInfo(CardEdition.COMMANDER_2014, null, "3037"));
 //
 //        //cr predprodej

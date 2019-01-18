@@ -207,24 +207,34 @@ function PageViewModel () {
         });
     };
 
+    self.tableImgClick = function(cardId){
+        utils.json.get({
+            url : '/rest/cards/' + cardId,
+            success : function(result) {
+                console.log(["get card",this, result]);
+                pageViewModel.populateCardDetail(new Card(result));
+            }
+        });
+    };
+
+    self.tableStarClick = function(cardId){
+        console.log("star: " + cardId);
+    };
+
+
     self.populateCardTable = function(cardsPojo){
         var tbody = $( "#cards-tbody1" );
         tbody.empty();
         cardsPojo.forEach(function(item) {
             var c = new Card(item);
-            tbody.append( "<tr><td>"+c.name+"</td><td>"+c.id+"</td><td></td></tr>" );
-            // tbody.append( "<tr><td>"+c.name+"</td><td>"+c.id+"</td><td>"+c.img+"</td></tr>" );
-        });
+            tbody.append( "<tr><td>"+c.name+"</td><td>"+c.id+"</td><td>" +
+                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableImgClick('"+c.id+"')\"><span class=\"glyphicon glyphicon-picture\"></span></button>" +
+                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableStarClick('"+c.id+"')\"><span class=\"glyphicon glyphicon-star\"></span></button>" +
+                "</td></tr>" );
 
-        $("div#cards-table1 > table > tbody > tr").click(function() {
-            var cardId = $(this).find("td").eq(1).html();
-            utils.json.get({
-                url : '/rest/cards/' + cardId,
-                success : function(result) {
-                    console.log(["get card",this, result]);
-                    pageViewModel.populateCardDetail(new Card(result));
-                }
-            });
+            // $("div#cards-table1 > table > tbody > tr").click(function() {
+            // var cardId = $(this).find("td").eq(1).html();
+            // });
         });
     }
 }

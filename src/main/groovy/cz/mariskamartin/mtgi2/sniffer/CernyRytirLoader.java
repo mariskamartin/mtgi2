@@ -99,6 +99,7 @@ public class CernyRytirLoader implements ISniffer {
     private Document fetchFromCernyRytirKusovkyPaged(CardEdition edice, String rarityCrPrefix) throws IOException {
         Document doc;
         doc = Jsoup.connect("http://www.cernyrytir.cz/index.php3?akce=3")
+                .timeout(5000)
                 .data("edice_magic", edice.getKey())
                 .data("rarita", rarityCrPrefix)
                 .data("foil", "A") // i s foil, R - bez, F - pouze foil
