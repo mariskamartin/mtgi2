@@ -86,6 +86,7 @@ public enum CardEdition {
     FUTURE_SIGHT("FUT", "Future Sight"),
     GATECRASH("GTC", "Gatecrash"),
     GUILDPACT("GPT", "Guildpact"),
+    GS_JIANG_YANGGU("GS1","GS: Jiang Yanggu"),
     HOMELANDS("HML", "Homelands"),
     HOUR_OF_DEVASTATION("HOU","Hour of Devastation"),
     ICE_AGE("ICE", "Ice Age"),

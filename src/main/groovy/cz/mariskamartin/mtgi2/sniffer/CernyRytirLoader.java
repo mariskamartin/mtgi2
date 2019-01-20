@@ -123,7 +123,8 @@ public class CernyRytirLoader implements ISniffer {
 
     public static void main(String[] args) {
         try {
-            List<DailyCardInfo> cards = new CernyRytirLoader().sniffByCardName("Sacred");
+            List<DailyCardInfo> cards = new CernyRytirLoader().sniffByEdition(CardEdition.GS_JIANG_YANGGU);
+            log.debug("size: {}", cards.size());
             log.debug("{}", cards);
         } catch (IOException e) {
             e.printStackTrace();
