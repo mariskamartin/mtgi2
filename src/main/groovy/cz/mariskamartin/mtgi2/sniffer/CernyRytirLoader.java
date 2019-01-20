@@ -2,6 +2,7 @@ package cz.mariskamartin.mtgi2.sniffer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import cz.mariskamartin.mtgi2.Utils;
 import cz.mariskamartin.mtgi2.controller.IndexController;
 import cz.mariskamartin.mtgi2.db.model.Card;
 import cz.mariskamartin.mtgi2.db.model.CardEdition;
@@ -68,9 +69,9 @@ public class CernyRytirLoader implements ISniffer {
 
                 Card card = CardConverter.valueOfCernyRytirElement(nameE, ediceTypE, dataE);
                 Elements select2 = dataE.select("font");
-                long skladem = Long.parseLong(select2.get(0).html().replace("&nbsp;", "").replace("ks", ""));
+                long skladem = Utils.parseLong(select2.get(0).html().replace("&nbsp;", "").replace("ks", ""), 0);
                 String[] val = select2.get(1).html().split("&nbsp;");
-                long cena = Long.parseLong(val[0]);
+                long cena = Utils.parseLong(val[0], 0);
 
                 DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.CERNY_RYTIR);
                 builder.add(dci);

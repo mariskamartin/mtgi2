@@ -29,7 +29,7 @@ public final class CardConverter {
         String name = innerValues.get(0).children().get(0).text().trim();
         return new Card(name.replaceAll(Pattern.quote(FOIL_TOLARIE), "").trim(),
                 name.contains(FOIL_TOLARIE),
-                CardRarity.valueFrom(innerValues.select("a[data-tooltip]").attr("data-tooltip").toUpperCase()),
+                CardRarity.valueFrom(innerValues.select("td.td_rarita > a[data-tooltip]").attr("data-tooltip").toUpperCase()),
                 CardEdition.valueFromName(innerValues.get(4).text().trim()));
     }
 

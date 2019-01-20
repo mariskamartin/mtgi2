@@ -19,7 +19,7 @@ public enum ManagedCardEditions {
     private Map<CardEdition, EditionInfo> managedEditions = Maps.newHashMap();
 
     ManagedCardEditions() {
-        add(CardEdition.RAVNICA_ALLEGIANCE, null,null);
+        add(CardEdition.RAVNICA_ALLEGIANCE, "edition_RNA",null);
         add(CardEdition.GUILDS_OF_RAVNICA, "edition_GRN",null);
         add(CardEdition.KHANS_OF_TARKIR, "edition_Khans_of_Tarkir","165");
 
@@ -32,6 +32,8 @@ public enum ManagedCardEditions {
         add(CardEdition.JOURNEY_INTO_NYX, "edition_Journey_Into_Nyx","164");
         add(CardEdition.BORN_OF_THE_GODS, "edition_Born_of_Gods","163");
         add(CardEdition.THEROS, "edition_Theros","162");
+
+//        add(CardEdition.TIMESHIFTED, "edition_Timeshifted", null);
 //        managed.add(new EditionInfo(CardEdition.COMMANDER_2014, null, "3037"));
 //
 //        //cr predprodej

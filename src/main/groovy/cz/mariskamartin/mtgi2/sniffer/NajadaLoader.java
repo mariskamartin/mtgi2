@@ -2,6 +2,7 @@ package cz.mariskamartin.mtgi2.sniffer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import cz.mariskamartin.mtgi2.Utils;
 import cz.mariskamartin.mtgi2.db.model.Card;
 import cz.mariskamartin.mtgi2.db.model.CardEdition;
 import cz.mariskamartin.mtgi2.db.model.CardShop;
@@ -52,8 +53,8 @@ public class NajadaLoader implements ISniffer {
             if (card.getName().replace(HTML_NBSP,"").trim().length() == 0) continue;
             try {
                 Elements innerValues = element.children();
-                long skladem = Long.parseLong(innerValues.select("div.stateNew").select("span").get(2).text().trim());
-                long cena = Long.parseLong(innerValues.select("div.stateNew").select("span").get(0).text().replace(" ", "").trim());
+                long skladem = Utils.parseLong(innerValues.select("div.stateNew").select("span").get(2).text().trim(), 0);
+                long cena = Utils.parseLong(innerValues.select("div.stateNew").select("span").get(0).text().replace(" ", "").trim(), 0);
                 DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.NAJADA);
                 builder.add(dci);
             } catch (NumberFormatException e) {
