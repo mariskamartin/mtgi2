@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CardRepository extends CrudRepository<Card, String> {
     List<Card> findByName(String name);
+    List<Card> findByNameOrderByNameAsc(String name);
     List<Card> findByNameContaining(String name);
     List<Card> findByRarity(CardRarity rarity);
     List<Card> findByEdition(CardEdition edition);

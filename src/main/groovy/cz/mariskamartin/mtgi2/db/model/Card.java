@@ -1,18 +1,16 @@
 package cz.mariskamartin.mtgi2.db.model;
 
 import com.google.common.base.MoreObjects;
-import cz.mariskamartin.mtgi2.db.JpaEntityTraceListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@EntityListeners(JpaEntityTraceListener.class)
 public class Card {
+    private static final Logger log = LoggerFactory.getLogger(Card.class);
+
     /**
      * As one place for META names
      */
@@ -110,10 +108,10 @@ public class Card {
     }
 
 
-    @PreUpdate
-    private void preUpdate() {
-        updated = new Date();
-    }
+//    @PreUpdate
+//    private void preUpdate() {
+////        updated = new Date();
+//    }
 
     @Override
     public String toString() {
@@ -125,4 +123,21 @@ public class Card {
                 .add("f", isFoil())
                 .toString();
     }
+
+
+    @PostPersist
+    void postPersist() {
+        log.debug("postPersist: {}", this);
+    }
+
+    @PostUpdate
+    void postUpdate() {
+        log.debug("postUpdate: {}", this);
+    }
+
+    @PostRemove
+    void postRemove() {
+        log.debug("postRemove: {}", this);
+    }
+
 }

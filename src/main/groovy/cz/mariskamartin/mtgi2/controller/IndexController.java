@@ -118,6 +118,21 @@ public class IndexController {
         return cards;
     }
 
+    @RequestMapping(value = "/cards/{name}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> cleanCardDci(@PathVariable("name") String name) throws IOException {
+        List<Card> cards = cardService.findCard(name);
+        for (Card card : cards) {
+            cardService.cleanCardsDailyCardInfoById(card.getId());
+        }
+        return cards;
+    }
+
+    @RequestMapping(value = "/cards/id/{id}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String cleanCardDciById(@PathVariable("id") String id) throws IOException {
+        cardService.cleanCardsDailyCardInfoById(id);
+        return "ok";
+    }
+
     @RequestMapping(value = "/dci/fetch/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Collection<Card> fetchDciByEdition(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByEdition(CardEdition.valueFromName(name));

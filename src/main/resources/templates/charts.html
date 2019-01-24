@@ -31,6 +31,7 @@
                     <input placeholder="card name?" id="findInput"/>
                     <button id="findCardButton" type="button" class="btn btn-success btn-sm">Find card</button>
                     <button id="fetchCardButton" type="button" class="btn btn-info btn-sm">Fetch card from shops</button>
+                    <button id="cleanCardDciButton" type="button" class="btn btn-warning btn-sm">Clean card dci</button>
                     <br />
                     <label for="editionInput">Edition:</label>
                     <input placeholder="edition name?" id="editionInput"/>
@@ -219,6 +220,12 @@ function PageViewModel () {
 
     self.tableStarClick = function(cardId){
         console.log("star: " + cardId);
+        utils.json.get({
+            url : '/rest/cards/id/'+cardId+'/dci/clean/',
+            success : function(result) {
+                utils.info("done celaning");
+            }
+        });
     };
 
 
@@ -303,6 +310,15 @@ $("#fetchManagedCards").click(function() {
     });
 });
 
+$("#cleanCardDciButton").click(function() {
+    var text = $('#findInput').val();
+    utils.json.get({
+        url : '/rest/cards/'+text+'/dci/clean/',
+        success : function(result) {
+            utils.info("done celaning");
+        }
+    });
+});
 </script>
 </body>
 </html>

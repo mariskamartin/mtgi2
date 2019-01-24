@@ -96,7 +96,9 @@ public class CardService {
                         if (cacheCardsMap.containsKey(Card.getIdKey(dailyCardInfo.getCard()))) {
                             dailyCardInfo.setCard(cacheCardsMap.get(Card.getIdKey(dailyCardInfo.getCard())));
                         }
-//                        dailyCardInfo.setCard(cardRepository.save(dailyCardInfo.getCard()));
+                        Optional<Card> cardById = cardRepository.findById(dailyCardInfo.getCard().getId());
+                        Card c = cardById.orElseGet(() -> cardRepository.save(dailyCardInfo.getCard()));
+                        dailyCardInfo.setCard(c);
                         dailyCardInfoRepository.save(dailyCardInfo);
                     } catch (DataIntegrityViolationException e) {
                         // speedup in storing, act only during constraint violation
@@ -125,6 +127,52 @@ public class CardService {
         }
         return managedCardsMap.values();
     }
+
+    /**
+         * Ma za ukol projit historii cen karty a zrusit duplicitni zaznamy cen.. zachovat pouze ty co se meni.
+            *
+            * @param id card ID*/
+    public void cleanCardsDailyCardInfoById(String id) {
+        boolean change = true;
+
+        Card card = cardRepository.findById(id).get();
+        List<DailyCardInfo> dciDaoByCard = dailyCardInfoRepository.findByCardOrderByShopAsc(card);
+        //items are naturaly ordered by day, because they are inserted day by day.. :/
+//        List<DailyCardInfo> dciDaoByCard2 = dailyCardInfoRepository.findByCardAndShopOrderByDay(card, CardShop.CERNY_RYTIR);
+//        List<DailyCardInfo> dciDaoByCard3 = dailyCardInfoRepository.findByCardIdOrderByDay(id);
+        Iterator<DailyCardInfo> iterator = dciDaoByCard.iterator();
+        //setridene podle shopu, dne
+
+        List<DailyCardInfo> deleteDci = Lists.newArrayList();
+        DailyCardInfo dBefore = null;
+        while (iterator.hasNext()) {
+            DailyCardInfo d = iterator.next();
+            log.debug("{}", d.toString());
+            if (dBefore != null) {
+                if (d.getShop().equals(dBefore.getShop())) {
+                    //logika pro smazani
+                    if (d.getPrice().equals(dBefore.getPrice())) {
+                        if (!change) {
+                            //smaz dci
+                            deleteDci.add(dBefore);
+//                            getEm().getTransaction().begin();
+//                            dciDao.delete(dBefore);
+//                            getEm().getTransaction().commit();
+                        }
+                        change = false;
+                    } else {
+                        change = true;
+                    }
+                } else {
+                    //jdeme na dalsi shop
+                    change = true;
+                }
+            }
+            dBefore = d;
+        }
+        dailyCardInfoRepository.deleteAll(deleteDci);
+    }
+
 
     private void waitForDci(List<DailyCardInfo> dailyCardInfos, List<Future<List<DailyCardInfo>>> futures) {
         for (Future<List<DailyCardInfo>> future : futures) {
