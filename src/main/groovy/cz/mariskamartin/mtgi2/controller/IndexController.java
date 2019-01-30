@@ -1,7 +1,7 @@
 package cz.mariskamartin.mtgi2.controller;
 
 import com.google.common.collect.Lists;
-import cz.mariskamartin.mtgi2.CardService;
+import cz.mariskamartin.mtgi2.services.CardService;
 import cz.mariskamartin.mtgi2.db.CardRepository;
 import cz.mariskamartin.mtgi2.db.DailyCardInfoRepository;
 import cz.mariskamartin.mtgi2.db.model.*;

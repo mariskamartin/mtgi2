@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@EntityListeners(CardJpaListener.class)
 public class Card {
     private static final Logger log = LoggerFactory.getLogger(Card.class);
 

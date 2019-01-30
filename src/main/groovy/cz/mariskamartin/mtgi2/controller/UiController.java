@@ -1,6 +1,6 @@
 package cz.mariskamartin.mtgi2.controller;
 
-import cz.mariskamartin.mtgi2.CardService;
+import cz.mariskamartin.mtgi2.services.CardService;
 import cz.mariskamartin.mtgi2.db.CardRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

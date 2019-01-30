@@ -1,4 +1,4 @@
-package cz.mariskamartin.mtgi2;
+package cz.mariskamartin.mtgi2.services;
 
 public class SyncService {
 

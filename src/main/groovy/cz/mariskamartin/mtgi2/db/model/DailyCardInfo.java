@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
-@EntityListeners(DailyCardInfoJpaListener.class)
 public class DailyCardInfo {
     private static final Logger log = LoggerFactory.getLogger(DailyCardInfo.class);
 

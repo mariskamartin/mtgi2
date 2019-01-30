@@ -1,4 +1,4 @@
-package cz.mariskamartin.mtgi2;
+package cz.mariskamartin.mtgi2.services;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
