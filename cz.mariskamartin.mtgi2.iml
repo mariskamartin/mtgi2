@@ -36,6 +36,7 @@
     <orderEntry type="library" name="Gradle: com.google.guava:guava:27.0.1-jre" level="project" />
     <orderEntry type="library" name="Gradle: org.jsoup:jsoup:1.8.3" level="project" />
     <orderEntry type="library" name="Gradle: joda-time:joda-time:2.10.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-json:2.1.1.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-aop:2.1.1.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-jdbc:2.1.1.RELEASE" level="project" />

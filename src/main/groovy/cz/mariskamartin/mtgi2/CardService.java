@@ -134,15 +134,9 @@ public class CardService {
             * @param id card ID*/
     public void cleanCardsDailyCardInfoById(String id) {
         boolean change = true;
-
-        Card card = cardRepository.findById(id).get();
-        List<DailyCardInfo> dciDaoByCard = dailyCardInfoRepository.findByCardOrderByShopAsc(card);
-        //items are naturaly ordered by day, because they are inserted day by day.. :/
-//        List<DailyCardInfo> dciDaoByCard2 = dailyCardInfoRepository.findByCardAndShopOrderByDay(card, CardShop.CERNY_RYTIR);
-//        List<DailyCardInfo> dciDaoByCard3 = dailyCardInfoRepository.findByCardIdOrderByDay(id);
+        List<DailyCardInfo> dciDaoByCard = dailyCardInfoRepository.findByCardIdOrderByShopAndDayAsc(id);
         Iterator<DailyCardInfo> iterator = dciDaoByCard.iterator();
         //setridene podle shopu, dne
-
         List<DailyCardInfo> deleteDci = Lists.newArrayList();
         DailyCardInfo dBefore = null;
         while (iterator.hasNext()) {
@@ -155,9 +149,6 @@ public class CardService {
                         if (!change) {
                             //smaz dci
                             deleteDci.add(dBefore);
-//                            getEm().getTransaction().begin();
-//                            dciDao.delete(dBefore);
-//                            getEm().getTransaction().commit();
                         }
                         change = false;
                     } else {

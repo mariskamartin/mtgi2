@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@EntityListeners(CardJpaListener.class)
 public class Card {
     private static final Logger log = LoggerFactory.getLogger(Card.class);
 
@@ -123,21 +124,23 @@ public class Card {
                 .add("f", isFoil())
                 .toString();
     }
-
-
-    @PostPersist
-    void postPersist() {
-        log.debug("postPersist: {}", this);
-    }
-
-    @PostUpdate
-    void postUpdate() {
-        log.debug("postUpdate: {}", this);
-    }
-
-    @PostRemove
-    void postRemove() {
-        log.debug("postRemove: {}", this);
-    }
+//
+//    @PostPersist
+//    void postPersist() {
+//        log.debug("postPersist: {}", this);
+////        journalRepository.save(new Journal("INSERT INTO DCI () VALUES ()", ""));
+//    }
+//
+//    @PostUpdate
+//    void postUpdate() {
+//        log.debug("postUpdate: {}", this);
+////        journalRepository.save(new Journal("UPDATE DCI SET ()", ""));
+//    }
+//
+//    @PostRemove
+//    void postRemove() {
+//        log.debug("postRemove: {}", this);
+////        journalRepository.save(new Journal("DELETE DCI  WHERE id = '" + this.id + "'", ""));
+//    }
 
 }
