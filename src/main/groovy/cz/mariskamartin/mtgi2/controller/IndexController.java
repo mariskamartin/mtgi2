@@ -5,6 +5,7 @@ import cz.mariskamartin.mtgi2.services.CardService;
 import cz.mariskamartin.mtgi2.db.CardRepository;
 import cz.mariskamartin.mtgi2.db.DailyCardInfoRepository;
 import cz.mariskamartin.mtgi2.db.model.*;
+import cz.mariskamartin.mtgi2.services.SyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class IndexController {
 
     @Autowired
     DailyCardInfoRepository dailyCardInfoRepository;
+
+    @Autowired
+    SyncService syncService;
 
 
     @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE})
@@ -157,6 +161,17 @@ public class IndexController {
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
         log.info("fetch cards = {}", cards);
         return cards;
+    }
+
+
+    @RequestMapping(value = "/sync/cards/init", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String syncCardsInit() throws IOException {
+        return "sync init db result = " + syncService.checkOrInitDb();
+    }
+
+    @RequestMapping(value = "/sync/cards", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String syncCards() throws IOException {
+        return "sync cards result = " + syncService.syncCards();
     }
 
 

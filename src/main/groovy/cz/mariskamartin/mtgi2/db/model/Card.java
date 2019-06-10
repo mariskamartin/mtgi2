@@ -27,6 +27,8 @@ public class Card {
     private Date created;
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date synced;
 
     @Enumerated(EnumType.STRING)
     private CardRarity rarity;
@@ -97,6 +99,14 @@ public class Card {
 
     public void setFoil(boolean foil) {
         this.foil = foil;
+    }
+
+    public Date getSynced() {
+        return synced;
+    }
+
+    public void setSynced(Date synced) {
+        this.synced = new Date(synced.getTime());
     }
 
     @PrePersist
