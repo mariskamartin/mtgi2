@@ -1,18 +1,17 @@
 package cz.mariskamartin.mtgi2.db.model;
 
 import com.google.common.base.MoreObjects;
-import cz.mariskamartin.mtgi2.db.JpaEntityTraceListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@EntityListeners(JpaEntityTraceListener.class)
+@EntityListeners(CardJpaListener.class)
 public class Card {
+    private static final Logger log = LoggerFactory.getLogger(Card.class);
+
     /**
      * As one place for META names
      */
@@ -40,7 +39,12 @@ public class Card {
     }
 
     //because of JPA
-    public Card() {}
+    protected Card() {}
+
+    // for find dci purpose
+    public Card(String cardId) {
+        this.id = cardId;
+    }
 
     public Card(String name, boolean foil, CardRarity rarity, CardEdition edition) {
         this.name = name;
@@ -86,6 +90,8 @@ public class Card {
         this.edition = edition;
     }
 
+    public String getEditionKey() { return edition.getKey(); }
+
     public boolean isFoil() {
         return foil;
     }
@@ -103,10 +109,10 @@ public class Card {
     }
 
 
-    @PreUpdate
-    private void preUpdate() {
-        updated = new Date();
-    }
+//    @PreUpdate
+//    private void preUpdate() {
+////        updated = new Date();
+//    }
 
     @Override
     public String toString() {
@@ -118,4 +124,23 @@ public class Card {
                 .add("f", isFoil())
                 .toString();
     }
+//
+//    @PostPersist
+//    void postPersist() {
+//        log.debug("postPersist: {}", this);
+////        journalRepository.save(new Journal("INSERT INTO DCI () VALUES ()", ""));
+//    }
+//
+//    @PostUpdate
+//    void postUpdate() {
+//        log.debug("postUpdate: {}", this);
+////        journalRepository.save(new Journal("UPDATE DCI SET ()", ""));
+//    }
+//
+//    @PostRemove
+//    void postRemove() {
+//        log.debug("postRemove: {}", this);
+////        journalRepository.save(new Journal("DELETE DCI  WHERE id = '" + this.id + "'", ""));
+//    }
+
 }

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MTG Inventory">
+    <meta name="author" content="Mariska Martin">
+
+    <title>MTG Inventory v2.0.0</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/lib/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- Load c3.css -->
+    <link href="/lib/c3/c3.css" rel="stylesheet" type="text/css">
+    <!-- Load pnotify.css -->
+    <link href="/lib/pnotify/pnotify.custom.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="./">MTG Inventory</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse">
+            <ul id="navigationMenu" class="nav navbar-nav">
+                <li data-bind="css: { active: activePage() == PAGES.HOME }"><a href="#/home">Home</a></li>
+                <li data-bind="css: { active: activePage() == PAGES.DETAIL }"><a href="#/detail">Card detail</a></li>
+                <li data-bind="css: { active: activePage() == PAGES.INTERESTS }"><a href="#/interests">Interests</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container" data-bind="template: { name: activeTemplate, afterRender: afterRenderActiveTemplate }">
+
+</div>
+<!-- /.container -->
+
+<!-- ------------------------------------------- -->
+<script type="text/html" id="home">
+    <div class="starter-template">
+        <h1>My MTG Inventory</h1>
+        <p class="lead">Tento projekt je zaměřen na evidenci a sledování cen karet na českém trhu pro hráče MTG.</p>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form data-bind="submit: HOME.findCardInForm">
+                <div class="form-group">
+                    <label for="findInput">Card:</label>
+                    <input data-bind="value: HOME.newText" placeholder="card name?" id="findInput"/>
+                    <button type="submit" class="btn btn-success btn-sm">Find card</button>
+                    <button type="button" class="btn btn-info btn-sm" data-bind="click: HOME.fetchCard">Fetch card from shop</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-condensed table-bordered center-table">
+                    <thead>
+                    <tr>
+                        <th>card name</th>
+                        <th>links</th>
+                        <th>info</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: HOME.cards">
+                    <tr>
+                        <td><a data-bind="text: name, attr: { href: hrefDetail }"></a><span data-bind="html: foilImg"></span></td>
+                        <td><span data-bind="html: crLink"></span> / <span data-bind="html: tolarieLink"></span></td>
+                        <td><span data-bind="text: edition"></span> /
+                            <span data-bind="text: rarity"></span> /
+                            <span data-bind="text: foilTxt"></span>
+                            <!--
+                            <a data-bind="visible: $root.user().idEmail, click: $root.addUserCardFromTable"><i class="glyphicon glyphicon-plus"></i></a>
+                            -->
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- ------------------------------------------- -->
+<script type="text/html" id="detail">
+    <h1>Detail page .. .</h1>
+    <div class="row">
+        <div id="cardDetail" class="col-md-12">
+            <h1>Card price history</h1>
+            <div id="priceChart"></div>
+        </div>
+    </div>
+</script>
+
+<!-- ------------------------------------------- -->
+<script type="text/html" id="interests">
+    <h1>interests page</h1>
+</script>
+
+
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type='text/javascript' src="/lib/routing/path.min.js"></script>
+<script type='text/javascript' src="/lib/store/store2.min.js"></script>
+<script type='text/javascript' src="/lib/jquery-1.8.3.js"></script>
+<script type='text/javascript' src="/lib/pnotify/pnotify.custom.min.js"></script>
+<script type='text/javascript' src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script type='text/javascript' src='/lib/knockout-3.1.0.min.js'></script>
+<!-- Load d3.js and c3.js -->
+<script src="/lib/c3/d3.min.js" charset="utf-8"></script>
+<script src="/lib/c3/c3.min.js"></script>
+<script src="/js/utils.js"></script>
+
+<script>
+var PAGES_URLS = {
+    HOME: "#/home",
+    INTERESTS: "#/interests",
+    DETAIL: "#/detail"
+};
+
+function Card(pojo) {
+    var self = this;
+    self.id = pojo.id;
+    self.name = pojo.name;
+    self.rarity = pojo.rarity;
+    self.edition = pojo.edition;
+    self.foil = pojo.foil;
+    self.storeAmount = ko.observable(pojo.storeAmount);
+    // others helps
+    self.hrefDetail = PAGES_URLS.DETAIL+"/" + pojo.id;
+    self.editionKey = pojo.editionKey;
+    self.foilTxt = pojo.foil ? "FOIL" : "";
+    self.foilImg = (pojo.foil ? " " + utils.icons.star : "");
+    self.crLink = "<a href=\"javascript:utils.links.openCernyRytir('" + this.name + "');\">Černý Rytíř</a>";
+    self.tolarieLink = "<a href=\"javascript:utils.links.openTolarie('" + this.name + "');\">Tolarie</a>";
+    self.magicCardsLink = "<a href=\"javascript:utils.links.openMagicCards('" + this.name + "');\">MagicCards</a>";
+    if (self.name && self.name !== "UNKNOWN") {
+        self.img = "<img src='http://cdn.manaclash.com/images/cards/210x297/" + this.editionKey + "/"
+        + this.name.replace(/ /g, "-").replace(/[,'´]/g, "").toLowerCase() + ".jpg' class='img-thumbnail'></img>";
+    }
+}
+Card.EMPTY = new Card({
+    id : 0,
+    name : "UNKNOWN",
+    price : 0,
+    storeAmount : "",
+    rarity : "UNKNOWN",
+    edition : "UNKNOWN",
+    editionKey : "UNKNOWN",
+    foil : false
+});
+/**
+ *
+ * @param pojo
+ */
+function CardMovement(pojo) {
+    var self = this;
+    self.cardPojo = pojo.card;
+    self.name = pojo.card.name;
+    self.rarity = pojo.card.rarity;
+    self.edition = pojo.card.edition;
+    self.shop = pojo.shop;
+    self.gainPrice = pojo.gainPrice;
+    self.gainPercentage = pojo.gainPercentage > 0 ? "+" + pojo.gainPercentage.toFixed(2) + " %" : pojo.gainPercentage.toFixed(2) + " %";
+    self.oldPrice = pojo.oldPrice;
+    self.newPrice = pojo.newPrice;
+    // others helps
+    self.hrefDetail = PAGES_URLS.DETAIL+"/" + pojo.card.id;
+    self.gainStatus = pojo.gainPercentage > 0 ? "success" : "danger";
+    self.foilImg = (pojo.card.foil ? " " + utils.icons.star : "");
+    self.info = self.edition;
+}
+
+function Page(ownProps){
+    utils.extend(this, ownProps);
+}
+Page.prototype = {
+    name : 'default',
+    onDOMReady : function(elements, viewModel){},
+    onUrlActivate : function(){}
+};
+
+var PAGES = {
+    HOME : new Page({
+        name: "home",
+        url: PAGES_URLS.HOME,
+        /**
+         * ViewModel is bind to global viewModel under page name. So it can be called foe example like HOME.cards
+         */
+        viewModel : function(){
+            var self = this;
+            self.cards = ko.observableArray([Card.EMPTY, Card.EMPTY]);
+            self.newText = ko.observable();
+            self.findCardInForm = function() {
+                self.findCard(self.newText());
+            };
+            self.findCard = function(text) {
+                utils.json.get({
+                    url : '/rest/cards/find/' + text,
+                    success : function(result) {
+                        var results = [];
+                        result.forEach(function(item) {
+                            results.push(new Card(item));
+                        });
+                        self.cards(results);
+                    }
+                });
+            };
+            self.fetchCard = function() {
+                utils.json.get({
+                    url : '/rest/dci/fetch/' + self.newText(),
+                    success : function(result) {
+                        var self = this;
+                        console.log(["fetch cards",this]);
+                        result.forEach(function(item) {
+                            self.cards.push(new Card(item));
+                        });
+                    }
+                });
+            };
+            return self;
+        },
+        root: true,
+        onUrlActivate: function(){
+            console.log("home page activated");
+        }
+    }),
+    DETAIL : new Page({
+        name: "detail",
+        url: PAGES_URLS.DETAIL,
+        viewModel : {},
+        onUrlActivate: function(){
+            console.log("detail page activated");
+        },
+        onDOMReady : function(elements, viewModel){
+            if(!viewModel.chartData){
+                viewModel.chartData = {
+                    x : ['x1', '2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04', '2015-01-05'],
+                    data: ['data1', Math.random()*60, Math.random()*60, Math.random()*15,42,12]
+                }
+            }
+            //vyrobeni grafu v DOM
+            var chart = c3.generate({
+                bindto: '#priceChart',
+                data : {
+                    xs : {
+                        data1: "x1"
+                    },
+                    columns : [ viewModel.chartData.x, viewModel.chartData.data ]
+                },
+                axis : {
+                    x : {
+                        type : 'timeseries',
+                        tick : {
+                            format : '%d.%m.%Y'
+                        }
+                    }
+                },
+                transition: {
+                    duration: 150
+                }
+            });
+//            chart.load({
+//                xs : {
+//                    data1: "x1"
+//                },
+//                columns : [ viewModel.chartData.x, viewModel.chartData.data ]
+//            });
+        },
+        INTERESTS : new Page({
+            name: "interests",
+            url: PAGES_URLS.INTERESTS,
+            viewModel : {},
+            onUrlActivate: function(){
+                console.log("interests page activated");
+            }
+        })
+    })
+};
+
+// MVVM for this html
+function PageViewModel () {
+    var self = this;
+    /**
+     * Active page rendered in html
+     */
+    self.activePage = ko.observable(PAGES.HOME);
+    /**
+     * Returns name of template fr active page
+     */
+    self.activeTemplate = function(element, bindingContext){
+        return bindingContext.$data.activePage().name;
+    };
+    /**
+     * Process action after render template
+     * @param elements - created DOM elements
+     * @param viewModel
+     */
+    self.afterRenderActiveTemplate = function(elements, viewModel) {
+        viewModel.activePage().onDOMReady(elements, viewModel);
+    };
+}
+
+var pageViewModel = new PageViewModel();
+
+//make routing to pages
+var pageNames = Object.getOwnPropertyNames(PAGES);
+pageNames.forEach(function(pageName) {
+    var item = PAGES[pageName];
+    //maps urls to pages instancies
+    Path.map(item.url).to(function(){
+        //activate page in viewModel
+        pageViewModel.activePage(item);
+        //call page action
+        item.onUrlActivate();
+    });
+    //root page
+    if (item.root)
+        Path.root(item.url);
+    //inject pages viewModel into global viewModel under PAGES name
+    if(item["viewModel"]){
+        if(item.viewModel instanceof Function){
+            pageViewModel[pageName] = item.viewModel() || {};
+        } else {
+            pageViewModel[pageName] = item.viewModel || {};
+        }
+    }
+});
+
+//KO bindings
+ko.applyBindings(pageViewModel);
+
+//listen to URL changes
+Path.listen();
+
+
+</script>
+</body>
+</html>

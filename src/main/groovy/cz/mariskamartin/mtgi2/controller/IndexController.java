@@ -3,23 +3,22 @@ package cz.mariskamartin.mtgi2.controller;
 import com.google.common.collect.Lists;
 import cz.mariskamartin.mtgi2.CardService;
 import cz.mariskamartin.mtgi2.db.CardRepository;
+import cz.mariskamartin.mtgi2.db.DailyCardInfoRepository;
 import cz.mariskamartin.mtgi2.db.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-@RequestMapping("/")
+@RequestMapping("/rest")
 @RestController
 public class IndexController {
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
@@ -30,6 +29,10 @@ public class IndexController {
     @Autowired
     CardRepository cardRepository;
 
+    @Autowired
+    DailyCardInfoRepository dailyCardInfoRepository;
+
+
     @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE})
     public String index() {
         return "GET / ... this overview \n" +
@@ -37,7 +40,7 @@ public class IndexController {
                 "GET /log-test \n" +
                 "GET /db/init \n" +
                 "GET /db/test \n" +
-                "GET /card?name=CardC \n" +
+                "GET /card/find/CardC \n" +
                 "GET /dci/fetch?name=Watery+Grave \n" +
                 "\n";
     }
@@ -88,28 +91,74 @@ public class IndexController {
     }
 
 
-    @RequestMapping(value = "/card", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<Card> findCard(@RequestParam("name") String name) {
+    @RequestMapping(value = "/cards/find/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public List<Card> findCard(@PathVariable("name") String name) {
         List<Card> card = cardService.findCard(name);
         log.info("found card = {}", card);
         return card;
     }
 
-    @RequestMapping(value = "/dci/fetch", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Collection<Card> fetchCard(@RequestParam("name") String name) throws IOException {
+    @RequestMapping(value = "/cards/{card-id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Card getCard(@PathVariable("card-id") String cardId) {
+        Optional<Card> card = cardRepository.findById(cardId);
+        log.info("get card = {}", card);
+        return card.get();
+    }
+
+    @RequestMapping(value = "/cards/fetch/managed/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchManaged() throws IOException {
+        List<Card> cards = cardService.fetchAllManagedEditions();
+        return cards;
+    }
+
+    @RequestMapping(value = "/dci/fetch/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchCard(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByName(name);
+        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
+        return cards;
+    }
+
+    @RequestMapping(value = "/cards/{name}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> cleanCardDci(@PathVariable("name") String name) throws IOException {
+        List<Card> cards = cardService.findCard(name);
+        for (Card card : cards) {
+            cardService.cleanCardsDailyCardInfoById(card.getId());
+        }
+        return cards;
+    }
+
+    @RequestMapping(value = "/cards/id/{id}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String cleanCardDciById(@PathVariable("id") String id) throws IOException {
+        cardService.cleanCardsDailyCardInfoById(id);
+        return "ok";
+    }
+
+    @RequestMapping(value = "/dci/fetch/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> fetchDciByEdition(@PathVariable("name") String name) throws IOException {
+        List<DailyCardInfo> dcis = cardService.fetchCardsByEdition(CardEdition.valueFromName(name));
+        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
+        return cards;
+    }
+
+
+    @RequestMapping(value = "/dci/{card-id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public List<DailyCardInfo> findDci(@PathVariable("card-id") String cardId) throws IOException {
+//        List<DailyCardInfo> byCardId = dailyCardInfoRepository.findByCardId(cardId);
+        List<DailyCardInfo> byCard = dailyCardInfoRepository.findByCard(new Card(cardId));
+        return byCard;
+    }
+
+    @RequestMapping(value = "/dci/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> dciTest() throws IOException, InterruptedException {
+        DailyCardInfo cardDCI1 = new DailyCardInfo(new Card("CardDCI1", true, CardRarity.SPECIAL, CardEdition.EDITION_5TH), BigDecimal.TEN, 2L, new Date(), CardShop.CERNY_RYTIR, null);
+        Thread.sleep(1000);
+        DailyCardInfo cardDCI2 = new DailyCardInfo(new Card("CardDCI1", true, CardRarity.SPECIAL, CardEdition.EDITION_5TH), BigDecimal.ONE, 2L, new Date(), CardShop.CERNY_RYTIR, null);
+        List<DailyCardInfo> dcis = Lists.newArrayList(cardDCI1, cardDCI2);
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
         log.info("fetch cards = {}", cards);
         return cards;
     }
 
-    @RequestMapping(value = "/dci/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Collection<Card> dciTest() throws IOException {
-        List<DailyCardInfo> dcis = Lists.newArrayList(new DailyCardInfo(new Card("CardDCI1", true, CardRarity.SPECIAL, CardEdition.EDITION_5TH), BigDecimal.TEN, 2L, new Date(), CardShop.CERNY_RYTIR));
-        Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
-        log.info("fetch cards = {}", cards);
-        return cards;
-    }
 
 
 }
