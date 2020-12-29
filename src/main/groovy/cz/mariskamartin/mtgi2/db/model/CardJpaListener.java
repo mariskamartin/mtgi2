@@ -1,36 +1,40 @@
 package cz.mariskamartin.mtgi2.db.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.*;
 
 public class CardJpaListener {
+    private static final Logger log = LoggerFactory.getLogger(CardJpaListener.class);
 
     @PrePersist
     public void methodInvokedBeforePersist(Card emp) {
-        System.out.println("persisting card = " + emp);
+        log.debug("persisting card = {}", emp.toString());
     }
 
     @PostPersist
     public void methodInvokedAfterPersist(Card emp) {
-        System.out.println("Persisted card = " + emp);
+        log.debug("Persisted card = {}", emp.toString());
     }
 
     @PreUpdate
     public void methodInvokedBeforeUpdate(Card emp) {
-        System.out.println("Updating card = " + emp);
+        log.debug("Updating card = ", emp.toString());
     }
 
     @PostUpdate
     public void methodInvokedAfterUpdate(Card emp) {
-        System.out.println("Updated card = " + emp);
+        log.debug("Updated card = {}", emp.toString());
     }
 
     @PreRemove
     private void methodInvokedBeforeRemove(Card emp) {
-        System.out.println("Removing card = " + emp);
+        log.debug("Removing card = {}", emp.toString());
     }
 
     @PostRemove
     public void methodInvokedAfterRemove(Card emp) {
-        System.out.println("Removed card = " + emp );
+        log.debug("Removed card = {}", emp.toString() );
     }
 }

@@ -27,7 +27,9 @@ public class CernyRytirLoader implements ISniffer {
     public List<DailyCardInfo> sniffByCardName(String name) throws IOException {
         Builder<DailyCardInfo> builder = ImmutableList.builder();
         parseCernyRytir(fetchFromCernyRytirKusovky(name), builder);
-        return builder.build();
+        ImmutableList<DailyCardInfo> build = builder.build();
+        log.info("sniff (card = {}) size = {}", name, build.size());
+        return build;
     }
 
     @Override
@@ -47,7 +49,9 @@ public class CernyRytirLoader implements ISniffer {
                 parseCernyRytir(fetchFromCernyRytirURL(href), builder);
             }
         }
-        return builder.build();
+        ImmutableList<DailyCardInfo> build = builder.build();
+        log.info("sniff (edition = {}) size = {}", edition.getName(), build.size());
+        return build;
     }
 
     /**
@@ -123,7 +127,8 @@ public class CernyRytirLoader implements ISniffer {
 
     public static void main(String[] args) {
         try {
-            List<DailyCardInfo> cards = new CernyRytirLoader().sniffByEdition(CardEdition.GS_JIANG_YANGGU);
+            CardEdition modern_horizons = CardEdition.valueFromName("Modern Horizons");
+            List<DailyCardInfo> cards = new CernyRytirLoader().sniffByEdition(modern_horizons);
             log.debug("size: {}", cards.size());
             log.debug("{}", cards);
         } catch (IOException e) {

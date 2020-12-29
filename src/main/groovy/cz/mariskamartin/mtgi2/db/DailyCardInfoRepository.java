@@ -25,6 +25,7 @@ public interface DailyCardInfoRepository extends CrudRepository<DailyCardInfo, S
     Long countByDay(Date day);
     Long countByDayAndShop(Date day, CardShop shop);
     Long countByDayAndShopAndCardEdition(Date day, CardShop shop, CardEdition edition);
+    Long countByCardEditionAndShopAndDay(CardEdition edition, CardShop shop, Date day);
 
 //    this is somehow wrong - it expects Card type not string...
 //    @Query("SELECT a FROM DailyCardInfo a WHERE a.card-id=?1")

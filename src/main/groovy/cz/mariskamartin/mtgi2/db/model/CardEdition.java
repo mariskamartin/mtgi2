@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Note: Pls do not change enum name when you have db records in cards!
+ */
 public enum CardEdition {
     AETHER_REVOLT("AER", "Aether Revolt"),
     ALARA_REBORN("ARB", "Alara Reborn"),
@@ -32,7 +35,19 @@ public enum CardEdition {
     COMMANDER("CMD", "Commander", "Magic: The Gathering-Commander"),
     COMMANDER_2013("C13", "Commander 2013", "Commander 2013 Edition"),
     COMMANDER_2014("C14", "Commander 2014", "Commander 2014 Edition"),
-    COMMANDERS_ARSENAL("CMA", "Commander's Arsenal"),
+    COMMANDER_2015("C15", "Commander 2015", "Commander 2015 Edition"),
+    COMMANDER_2016("C16", "Commander 2016", "Commander 2016 Edition"),
+    COMMANDER_2017("C17", "Commander 2017", "Commander 2017 Edition"),
+    COMMANDER_2018("C18", "Commander 2018", "Commander 2018 Edition"),
+    COMMANDER_2019("C19", "Commander 2019", "Commander 2019 Edition"),
+    COMMANDER_2020("C20", "Commander 2020", "Commander 2020 Edition"),
+    COMMANDERS_ARSENAL("COA", "Commander's Arsenal"),
+    COMMANDERS_ANTHOLOGY("CMA", "Commander Anthology"),
+    COMMANDERS_ANTHOLOGY2("CM2", "Commander Anthology II"),
+    COMMANDERS_CMR("CMR", "Commander Legends"),
+    COMMANDERS_CMR_EXTRAS("CLE", "Commander CMR Extras"),
+    COMMANDERS_ZNC("ZNC", "Commander ZNR"),
+    COMMANDERS_CC1("CC1", "Commander Coll.: Green"),
     CONFLUX("CON", "Conflux"),
     CONSPIRACY("CNS", "Conspiracy","Magic: The Gathering—Conspiracy"),
     CLASH_PACK_2015("CP15", "Clash Pack 2015","Clash Pack 2015 foils"),
@@ -108,13 +123,18 @@ public enum CardEdition {
     MAGIC_2014("M14", "Magic 2014", "MAGIC 14", "Magic 2014 Core Set"),
     MAGIC_2015("M15", "Magic 2015", "MAGIC 15", "Magic 2015 Core Set"),
     MAGIC_2019("M19", "Core Set 2019"),
+    MAGIC_2020("M20", "Core Set 2020"),
+    MAGIC_2021("M21", "Core Set 2021"),
+    MAGIC_E21("E21", "Core Set 2021 Extras", "Core Set 2021 - Extras"),
     MAGIC_ORIGINS("ORI","Magic Origins"),
     MERCADIAN_MASQUES("MMQ", "Mercadian Masques"),
     MIRAGE("MIR", "Mirage"),
     MIRRODIN("MRD", "Mirrodin"),
     MIRRODIN_BESIEGED("MBS", "Mirrodin Besieged"),
     MODERN_EVENT_DECK("MED", "Modern Event Deck", "Modern Event Deck 2014"),
+    MODERN_HORIZONS("MH1", "Modern Horizons"),
     MODERN_MASTERS("MMA", "Modern Masters"),
+    MASTERS_SERIES_TOLARIE("XTMS", "Masters Series"),
     MODERN_MASTERS_2015("MM2", "Modern Masters 2015", "Modern Masters 2015 Edition"),
     MODERN_MASTERS_2017("MM3", "Modern Masters 2017", "Modern Masters 2017 Edition"),
     MORNINGTIDE("MOR", "Morningtide"),
@@ -167,6 +187,8 @@ public enum CardEdition {
     UNGLUED("UGL", "Unglued"),
     UNHINGED("UNH", "Unhinged", "Unhinged Edition"),
     UNLIMITED("2ED", "Unlimited", "Unlimited Edition"),
+    UNSANCTIONED("UND", "Unsanctioned", "Unlimited Edition"),
+    UNSTABLE("UST", "Unstable", "Unlimited Edition"),
     URZAS_DESTINY("UDS", "Urza's Destiny"),
     URZAS_LEGACY("ULG", "Urza's Legacy"),
     URZAS_SAGA("USG", "Urza's Saga"),
@@ -177,6 +199,19 @@ public enum CardEdition {
     ZENDIKAR_EXPEDITIONS("ZEX", "Zendikar Expeditions"),
     WHITE_BORDERED("WBBS", "Whitebordered Basic sets"),
     BLACK_BORDERED("BBBS", "Blackbordered Basic Sets"),
+    ZENDIKAR_RISING("ZNR", "Zendikar Rising"),
+    ZENDIKAR_RISING_EXTRAS("ZRE", "Zendikar Rising Extras", "Zendikar Rising - Extras"),
+    ZNR_EXPEDITIONS("ZRX", "ZNR Expeditions"),
+    DOUBLE_MASTERS("2XM", "Double Masters"),
+    DOUBLE_MASTERS_EXTRAS("2ME", "Double Masters Extras", "Double Masters - Extras"),
+    IKORIA("IKO", "Ikoria"),
+    IKORIA_EXTRAS("IKE", "Ikoria Extras", "Ikoria - Extras"),
+    MYSTERY_BOOSTER("MB1", "Mystery Booster"),
+    THEROS_BEYOND_THE_DEATH("THB", "Theros Beyond Death"),
+    THEROS_EXTRAS("THE", "Theros Extras"),
+    THRONE_OF_ELDRANE_("ELD", "Throne of Eldraine"),
+    THRONE_OF_ELDRANE_EXTRAS("ELE", "Throne of Eldraine Extras", "Throne of Eldraine - Extras"),
+    WAR_OF_THE_SPARK("WAR","War of the Spark"),
     UNKNOWN("???", "Unknown", "Legacy", "Foreign Black Bordered");
 
 

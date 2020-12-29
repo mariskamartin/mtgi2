@@ -13,6 +13,9 @@ import java.util.Date;
 
 @Entity
 @EntityListeners(DailyCardInfoJpaListener.class)
+@Table(indexes = {
+    @Index(name = "mulitIndex1", columnList = "shop, day"),
+})
 public class DailyCardInfo {
     private static final Logger log = LoggerFactory.getLogger(DailyCardInfo.class);
 

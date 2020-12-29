@@ -19,8 +19,8 @@ public enum ManagedCardEditions {
     private Map<CardEdition, EditionInfo> managedEditions = Maps.newHashMap();
 
     ManagedCardEditions() {
-        add(CardEdition.RAVNICA_ALLEGIANCE, "edition_RNA",null);
-        add(CardEdition.GUILDS_OF_RAVNICA, "edition_GRN",null);
+        add(CardEdition.RAVNICA_ALLEGIANCE, "edition_RNA","180");
+        add(CardEdition.GUILDS_OF_RAVNICA, "edition_GRN","179");
         add(CardEdition.KHANS_OF_TARKIR, "edition_Khans_of_Tarkir","165");
 
         add(CardEdition.MODERN_MASTERS_2017, "edition_vanoce",null);
@@ -251,12 +251,18 @@ Tokens = edition_tokens
         private String tolarieUrlKey;
         private CardEdition edition;
         private String rishadaUrlKey;
+        private String najadaUrlKey;
 
-        public EditionInfo(CardEdition edition, String tolarieUrlKey, String rishadaUrlKey) {
+        public EditionInfo(CardEdition edition, String tolarieUrlKey, String rishadaUrlKey, String najadaUrlKey) {
             super();
             this.edition = edition;
             this.tolarieUrlKey = tolarieUrlKey;
             this.rishadaUrlKey = rishadaUrlKey;
+            this.najadaUrlKey = najadaUrlKey;
+        }
+
+        public EditionInfo(CardEdition edition, String tolarieUrlKey, String rishadaUrlKey) {
+            this(edition, tolarieUrlKey, rishadaUrlKey, null);
         }
 
         public String getTolarieUrlKey() {
@@ -274,5 +280,7 @@ Tokens = edition_tokens
         public String getRishadaUrlKey() {
             return rishadaUrlKey;
         }
+
+        public String getNajadaUrlKey() { return najadaUrlKey; }
     }
 }

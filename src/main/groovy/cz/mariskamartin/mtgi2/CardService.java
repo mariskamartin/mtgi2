@@ -50,16 +50,22 @@ public class CardService {
     }
 
     public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) {
+        log.info("start fetching edition {}", edition.getName());
         List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
 
         List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
         if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.CERNY_RYTIR, edition) == 0 ) {
             futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByEdition(edition)));
+        } else {
+            log.debug("CernyRytir already has DCI today");
         }
         if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.TOLARIE, edition) == 0 ) {
             futures.add(executorService.submit(() -> new TolarieLoader().sniffByEdition(edition)));
+        } else {
+            log.debug("Tolarie already has DCI today");
         }
         waitForDci(dailyCardInfos, futures);
+        log.info("fetched edition #dci = {}", dailyCardInfos.size());
         return dailyCardInfos;
     }
 
@@ -80,6 +86,7 @@ public class CardService {
     }
 
     public Collection<Card> saveCardsIntoDb(List<DailyCardInfo> cardList) {
+        log.info("storing dci ({}) to db", cardList.size());
         Map<String, Card> cacheCardsMap = new HashMap<String, Card>();
         Map<String, Card> managedCardsMap = new HashMap<String, Card>();
         try {
@@ -125,6 +132,7 @@ public class CardService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        log.info("stored dci ({}) to db", managedCardsMap.size());
         return managedCardsMap.values();
     }
 
