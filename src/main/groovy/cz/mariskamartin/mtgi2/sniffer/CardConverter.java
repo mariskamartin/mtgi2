@@ -53,13 +53,20 @@ public final class CardConverter {
     }
 
     public static Card valueOfRishadaElement(Element element) {
-//        Card c = new Card();
-//        Elements innerValues = element.children();
-//        c.setName(innerValues.get(0).text().trim());
-//        c.setFoil(innerValues.get(1).text().toLowerCase().contains("ano"));
-//        c.setRarity(CardRarity.valueFrom(innerValues.get(4).text().trim().toUpperCase()));
-//        c.setEdition(CardEdition.valueFromName(innerValues.get(1).text().trim()));
-//        return c;
-        throw new UnsupportedOperationException();
+        Elements innerValues = element.children();
+        String name = innerValues.get(0).text().trim();
+        boolean isFoil = innerValues.select("img.cardtag").outerHtml().contains("Foil");
+        CardRarity rarity = CardRarity.valueFrom(innerValues.get(6).text().trim().toUpperCase());
+        CardEdition edition = CardEdition.valueFromName(innerValues.get(1).text().trim());
+        return new Card(name, isFoil, rarity, edition);
+    }
+
+    public static Card valueOfBlackLotusElement(Element element) {
+        Elements innerValues = element.children();
+        String name = innerValues.get(0).children().get(0).text().trim();
+        return new Card(name.replaceAll(Pattern.quote(FOIL_TOLARIE), "").trim(),
+                name.contains(FOIL_TOLARIE),
+                CardRarity.valueFrom(innerValues.select("td.td_rarita > a[data-tooltip]").attr("data-tooltip").toUpperCase()),
+                CardEdition.valueFromName(innerValues.get(4).text().trim()));
     }
 }

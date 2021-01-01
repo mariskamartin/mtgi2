@@ -127,7 +127,7 @@ public class CernyRytirLoader implements ISniffer {
 
     public static void main(String[] args) {
         try {
-            CardEdition modern_horizons = CardEdition.valueFromName("Modern Horizons");
+            CardEdition modern_horizons = CardEdition.valueFromName("Eldritch Moon");
             List<DailyCardInfo> cards = new CernyRytirLoader().sniffByEdition(modern_horizons);
             log.debug("size: {}", cards.size());
             log.debug("{}", cards);

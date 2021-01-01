@@ -11,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -98,11 +102,19 @@ public class IndexController {
         return card;
     }
 
-    @RequestMapping(value = "/cards/{card-id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Card getCard(@PathVariable("card-id") String cardId) {
+    @GetMapping("/cards/detail/**")
+    public Card getCard(HttpServletRequest request) throws UnsupportedEncodingException {
+        String cardId = getCardIdFromLastEncodedPath(request, "/cards/detail/");
         Optional<Card> card = cardRepository.findById(cardId);
         log.info("get card = {}", card);
         return card.get();
+    }
+
+    @GetMapping("/dci/detail/**")
+    public List<DailyCardInfo> getDciForCard(HttpServletRequest request) throws UnsupportedEncodingException {
+        String cardId = getCardIdFromLastEncodedPath(request, "/dci/detail/");
+        List<DailyCardInfo> dciList = dailyCardInfoRepository.findByCard(new Card(cardId));
+        return dciList;
     }
 
     @RequestMapping(value = "/cards/fetch/managed/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -112,25 +124,19 @@ public class IndexController {
     }
 
     @RequestMapping(value = "/dci/fetch/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Collection<Card> fetchCard(@PathVariable("name") String name) throws IOException {
+    public Collection<Card> fetchCards(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByName(name);
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
         return cards;
     }
 
-    @RequestMapping(value = "/cards/{name}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Collection<Card> cleanCardDci(@PathVariable("name") String name) throws IOException {
+    @RequestMapping(value = "/dci/clean/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> cleanFoundCardsDci(@PathVariable("name") String name) throws IOException {
         List<Card> cards = cardService.findCard(name);
         for (Card card : cards) {
             cardService.cleanCardsDailyCardInfoById(card.getId());
         }
         return cards;
-    }
-
-    @RequestMapping(value = "/cards/id/{id}/dci/clean/", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public String cleanCardDciById(@PathVariable("id") String id) throws IOException {
-        cardService.cleanCardsDailyCardInfoById(id);
-        return "ok";
     }
 
     @RequestMapping(value = "/dci/fetch/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -140,13 +146,6 @@ public class IndexController {
         return cards;
     }
 
-
-    @RequestMapping(value = "/dci/{card-id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<DailyCardInfo> findDci(@PathVariable("card-id") String cardId) throws IOException {
-//        List<DailyCardInfo> byCardId = dailyCardInfoRepository.findByCardId(cardId);
-        List<DailyCardInfo> byCard = dailyCardInfoRepository.findByCard(new Card(cardId));
-        return byCard;
-    }
 
     @RequestMapping(value = "/dci/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Collection<Card> dciTest() throws IOException, InterruptedException {
@@ -159,6 +158,19 @@ public class IndexController {
         return cards;
     }
 
+    @RequestMapping(value = "/dci/clean-all", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String cleanAllDcis() {
+        for (Card card : cardRepository.findAll()) {
+            log.info("clean dci {}", card.toString());
+            cardService.cleanCardsDailyCardInfoById(card.getId());
+        }
+        return "ok";
+    }
+
+    private String getCardIdFromLastEncodedPath(HttpServletRequest request, String mappingPath) throws UnsupportedEncodingException {
+        String cardIdEncoded = request.getRequestURI().split(request.getContextPath() + mappingPath)[1];
+        return URLDecoder.decode(cardIdEncoded, StandardCharsets.UTF_8.toString());
+    }
 
 
 }

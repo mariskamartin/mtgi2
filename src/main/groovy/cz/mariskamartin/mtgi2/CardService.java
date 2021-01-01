@@ -7,13 +7,13 @@ import cz.mariskamartin.mtgi2.db.DailyCardInfoRepository;
 import cz.mariskamartin.mtgi2.db.model.*;
 import cz.mariskamartin.mtgi2.sniffer.CernyRytirLoader;
 import cz.mariskamartin.mtgi2.sniffer.NajadaLoader;
+import cz.mariskamartin.mtgi2.sniffer.RishadaLoader;
 import cz.mariskamartin.mtgi2.sniffer.TolarieLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -45,28 +45,34 @@ public class CardService {
         futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByCardName(name)));
         futures.add(executorService.submit(() -> new NajadaLoader().sniffByCardName(name)));
         futures.add(executorService.submit(() -> new TolarieLoader().sniffByCardName(name)));
+        futures.add(executorService.submit(() -> new RishadaLoader().sniffByCardName(name)));
         waitForDci(dailyCardInfos, futures);
         return dailyCardInfos;
     }
 
     public List<DailyCardInfo> fetchCardsByEdition(CardEdition edition) {
         log.info("start fetching edition {}", edition.getName());
-        List<DailyCardInfo> dailyCardInfos = Lists.newLinkedList();
+        List<DailyCardInfo> dailyCardInfoList = Lists.newLinkedList();
 
         List<Future<List<DailyCardInfo>>> futures = new ArrayList<>();
-        if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.CERNY_RYTIR, edition) == 0 ) {
+
+        if(!hasTodayDCIs(CardShop.CERNY_RYTIR, edition))
             futures.add(executorService.submit(() -> new CernyRytirLoader().sniffByEdition(edition)));
-        } else {
-            log.debug("CernyRytir already has DCI today");
-        }
-        if (dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), CardShop.TOLARIE, edition) == 0 ) {
+        if(!hasTodayDCIs(CardShop.TOLARIE, edition))
             futures.add(executorService.submit(() -> new TolarieLoader().sniffByEdition(edition)));
-        } else {
-            log.debug("Tolarie already has DCI today");
-        }
-        waitForDci(dailyCardInfos, futures);
-        log.info("fetched edition #dci = {}", dailyCardInfos.size());
-        return dailyCardInfos;
+//        if(!hasTodayDCIs(CardShop.NAJADA, edition))
+//            futures.add(executorService.submit(() -> new NajadaLoader().sniffByEdition(edition)));
+        if(!hasTodayDCIs(CardShop.RISHADA, edition))
+            futures.add(executorService.submit(() -> new RishadaLoader().sniffByEdition(edition)));
+        waitForDci(dailyCardInfoList, futures);
+        log.info("fetched edition #dci = {}", dailyCardInfoList.size());
+        return dailyCardInfoList;
+    }
+
+    private boolean hasTodayDCIs(CardShop shop, CardEdition edition) {
+        boolean hasDCIs = dailyCardInfoRepository.countByDayAndShopAndCardEdition(new Date(), shop, edition) > 0;
+        if (hasDCIs) log.debug("{} already has DCIs today", shop.name());
+        return hasDCIs;
     }
 
     //    @Scheduled(cron = "0 0 10 * * *") //each day in 10.00
@@ -149,7 +155,7 @@ public class CardService {
         DailyCardInfo dBefore = null;
         while (iterator.hasNext()) {
             DailyCardInfo d = iterator.next();
-            log.debug("{}", d.toString());
+            log.trace("{}", d.toString());
             if (dBefore != null) {
                 if (d.getShop().equals(dBefore.getShop())) {
                     //logika pro smazani

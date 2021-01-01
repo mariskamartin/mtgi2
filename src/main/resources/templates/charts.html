@@ -108,7 +108,7 @@ function Card(pojo) {
     }
 }
 Card.EMPTY = new Card({
-    id : 0,
+    id : "",
     name : "UNKNOWN",
     price : 0,
     storeAmount : "",
@@ -145,11 +145,12 @@ function PageViewModel () {
 
     self.populateCardDetail = function(card) {
         utils.json.get({
-            url : './rest/dci/' + card.id,
+            url : '/rest/dci/detail/' + encodeURI(card.id).replace("#","%23"),
             success : function(result) {
                 console.log(["fetch dcis", this, result]);
                 // var chartId = "pc-1";
-                var encCardId = card.id.split('|').join('').split(' ').join('').split(',').join('');
+                var encCardId = card.id.replaceAll("/","_").replaceAll("´","_").replaceAll("'","").replaceAll("(","").replaceAll(")","").replaceAll("#","").split('|').join('').split(' ').join('').split(',').join('');
+//                var encCardId = card.id.replaceAll(/[\/|,'´()#] /g,"_")
                 var chartId = "pc-" + encCardId;
                 var divId = "div-" + encCardId;
 
@@ -208,9 +209,11 @@ function PageViewModel () {
         });
     };
 
-    self.tableImgClick = function(cardId){
+    self.tableImgClick = function(cardIndex){
+        var cardId = self.cardTableMap[cardIndex]
+        var encodedCardId = encodeURI(cardId)
         utils.json.get({
-            url : '/rest/cards/' + cardId,
+            url : '/rest/cards/detail/' + encodeURI(cardId).replace("#","%23"),
             success : function(result) {
                 console.log(["get card",this, result]);
                 pageViewModel.populateCardDetail(new Card(result));
@@ -218,10 +221,12 @@ function PageViewModel () {
         });
     };
 
-    self.tableStarClick = function(cardId){
+    self.tableStarClick = function(cardIndex){
+        var cardId = self.cardTableMap[cardIndex]
         console.log("star: " + cardId);
         utils.json.get({
-            url : '/rest/cards/id/'+cardId+'/dci/clean/',
+            // this will not work when card contains //
+            url : '/rest/cards/clean-dci/'+encodeURI(cardId).replace("#","%23"),
             success : function(result) {
                 utils.info("done celaning");
             }
@@ -229,14 +234,19 @@ function PageViewModel () {
     };
 
 
+
     self.populateCardTable = function(cardsPojo){
+        self.cardTableMap = {};
+        var i = -1;
         var tbody = $( "#cards-tbody1" );
         tbody.empty();
         cardsPojo.forEach(function(item) {
             var c = new Card(item);
+            //store correct card ID for later use
+            self.cardTableMap[++i] = c.id
             tbody.append( "<tr><td>"+c.name+"</td><td>"+c.id+"</td><td>" +
-                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableImgClick('"+c.id+"')\"><span class=\"glyphicon glyphicon-picture\"></span></button>" +
-                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableStarClick('"+c.id+"')\"><span class=\"glyphicon glyphicon-star\"></span></button>" +
+                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableImgClick('"+i+"')\"><span class=\"glyphicon glyphicon-picture\"></span></button>" +
+                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableStarClick('"+i+"')\"><span class=\"glyphicon glyphicon-star\"></span></button>" +
                 "</td></tr>" );
 
             // $("div#cards-table1 > table > tbody > tr").click(function() {
@@ -313,7 +323,7 @@ $("#fetchManagedCards").click(function() {
 $("#cleanCardDciButton").click(function() {
     var text = $('#findInput').val();
     utils.json.get({
-        url : '/rest/cards/'+text+'/dci/clean/',
+        url : '/rest/dci/clean/'+text+'',
         success : function(result) {
             utils.info("done celaning");
         }
