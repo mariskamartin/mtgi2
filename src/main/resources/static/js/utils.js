@@ -141,6 +141,15 @@
         });
     }
 
+    function titleCase(str) {
+        var splitStr = str.toLowerCase().split(' ');
+        for (var i = 0; i < splitStr.length; i++) {
+            if (splitStr[i] == 'of' || splitStr[i] == 'the') continue
+            splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        str = splitStr.join(" ");
+        return str;
+    }
     //-------------------------------------------
     //export functions...
     global.utils = {
@@ -164,7 +173,7 @@
             error: error
         },
         uuid: generateUUID,
-
+        titleCase: titleCase,
         //others
         icons: {
             star: "<span class=\"glyphicon glyphicon-star\" title=\"Foil version of card\"></span>",

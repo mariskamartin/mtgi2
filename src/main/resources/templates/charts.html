@@ -15,7 +15,7 @@
     <!-- Custom styles for this template -->
     <link href="/lib/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <!-- Load c3.css -->
-    <link href="/lib/c3/c3.css" rel="stylesheet" type="text/css">
+    <link href="/lib/c3/c3.min.css" rel="stylesheet" type="text/css">
     <!-- Load pnotify.css -->
     <link href="/lib/pnotify/pnotify.custom.min.css" rel="stylesheet" type="text/css">
 </head>
@@ -79,10 +79,10 @@
 <script type='text/javascript' src="/lib/bootstrap/js/bootstrap.min.js"></script>
 <script type='text/javascript' src="/lib/pnotify/pnotify.custom.min.js"></script>
 
-<!-- Load d3.js and c3.js -->
-<script src="/lib/c3/d3.min.js" charset="utf-8"></script>
-<script src="/lib/c3/c3.min.js"></script>
-<script src="/js/utils.js"></script>
+<!-- Load d3.js and c3.v0.7.20.js -->
+<script src="/lib/c3/d3.v5.min.js" charset="utf-8"></script>
+<script src="/lib/c3/c3.min.js" charset="utf-8"></script>
+<script src="/js/utils.js" charset="utf-8"></script>
 
 <script>
 
@@ -228,7 +228,7 @@ function PageViewModel () {
             // this will not work when card contains //
             url : '/rest/cards/clean-dci/'+encodeURI(cardId).replace("#","%23"),
             success : function(result) {
-                utils.info("done celaning");
+                utils.msg.info("done celaning");
             }
         });
     };
@@ -266,9 +266,10 @@ $( document ).ready(function() {
 
 $( "#findCardButton" ).click(function() {
     console.log( "Handler for .click() called." );
-    var text = $('#findInput').val();
+    var fixedText = utils.titleCase($('#findInput').val());
+    $('#findInput').val(fixedText);
     utils.json.get({
-        url : '/rest/cards/find/' + text,
+        url : '/rest/cards/find/' + fixedText,
         success : function(result) {
             console.log(["find cards",this, result]);
             pageViewModel.populateCardTable(result);
@@ -279,9 +280,10 @@ $( "#findCardButton" ).click(function() {
 $( "#fetchCardButton" ).click(function(e) {
     e.preventDefault();
     console.log( "Handler for fetchCardButton .click() called." );
-    var text = $('#findInput').val();
+    var fixedText = utils.titleCase($('#findInput').val());
+    $('#findInput').val(fixedText);
     utils.json.get({
-        url : '/rest/dci/fetch/' + text,
+        url : '/rest/dci/fetch/' + fixedText,
         success : function(result) {
             console.log(["fetch cards",this, result]);
             pageViewModel.populateCardTable(result);
@@ -315,7 +317,7 @@ $("#fetchManagedCards").click(function() {
     utils.json.get({
         url : '/rest/cards/fetch/managed/',
         success : function(result) {
-            utils.info("done loading managed cards");
+            utils.msg.info("done loading managed cards");
         }
     });
 });
@@ -325,7 +327,7 @@ $("#cleanCardDciButton").click(function() {
     utils.json.get({
         url : '/rest/dci/clean/'+text+'',
         success : function(result) {
-            utils.info("done celaning");
+            utils.msg.info("done cleaning");
         }
     });
 });
