@@ -111,6 +111,8 @@ public enum CardEdition {
     INVASION("INV", "Invasion"),
     JOURNEY_INTO_NYX("JOU", "Journey into Nyx"),
     JUDGMENT("JUD", "Judgment"),
+    KALDHEIM("KHM","Kaldheim"),
+    KHE("KHE","Kaldheim Extras", "Kaldheim Extra"),
     KHANS_OF_TARKIR("KTK", "Khans of Tarkir"),
     KALADESH("KLD","Kaladesh"),
     KALADESH_INVENTIONS("KLI","Kaladesh Inventions"),

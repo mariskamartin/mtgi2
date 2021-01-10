@@ -144,7 +144,7 @@
     function titleCase(str) {
         var splitStr = str.toLowerCase().split(' ');
         for (var i = 0; i < splitStr.length; i++) {
-            if (splitStr[i] == 'of' || splitStr[i] == 'the') continue
+            if (splitStr[i] == 'of' || splitStr[i] == 'the' || splitStr[i] == 'to') continue
             splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
         }
         str = splitStr.join(" ");

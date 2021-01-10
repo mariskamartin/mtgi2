@@ -101,7 +101,7 @@ public class TolarieLoader implements ISniffer {
         String urlRequest = "http://www.tolarie.cz/koupit_karty/?name=&edition=" + edice
                 + "&o=name&od=a&foil=False&stored=False&p=" + page;
 
-        Document doc = Jsoup.connect(urlRequest).validateTLSCertificates(true).ignoreHttpErrors(true).followRedirects(true).timeout(10000).get();
+        Document doc = Jsoup.connect(urlRequest).ignoreHttpErrors(true).followRedirects(true).timeout(10000).get();
         return doc;
 // return Jsoup.parse(new File("C://tolarie.html"), "utf-8"); //for DEBUG
 // return Jsoup.parse(new File("C://tolarie.html"), "windows-1250"); // for DEBUG

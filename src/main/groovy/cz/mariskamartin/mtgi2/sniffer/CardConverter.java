@@ -18,7 +18,7 @@ public final class CardConverter {
     private static final String CR_FOIL = " - foil";
     private static final String FOIL_TOLARIE = "(foil)";
 
-    private static final String CR_PREDOBJEDNAVKA = " (předobjednávka, vychází 23.1)";
+    private static final String CR_PREDOBJEDNAVKA = " (předobjednávka, vychází 5.2)";
     private static final String CR_PREDOBJEDNAVKA_ALL = "(.*)(\\(.+edobjedn.*\\))";//Blood Crypt (předobjednávka, vychází 25.1) - foil
 
     private CardConverter() {

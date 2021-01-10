@@ -6,6 +6,7 @@ import cz.mariskamartin.mtgi2.db.model.CardRarity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CardRepository extends CrudRepository<Card, String> {
     List<Card> findByName(String name);
@@ -14,4 +15,7 @@ public interface CardRepository extends CrudRepository<Card, String> {
     List<Card> findByRarity(CardRarity rarity);
     List<Card> findByEdition(CardEdition edition);
     List<Card> findByFoil(boolean foil);
+
+    List<Card> removeById(String cardId);
+
 }

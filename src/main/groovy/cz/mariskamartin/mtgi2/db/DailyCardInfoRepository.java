@@ -15,6 +15,9 @@ public interface DailyCardInfoRepository extends CrudRepository<DailyCardInfo, S
     List<DailyCardInfo> findByCard(Card card);
     List<DailyCardInfo> findByCardOrderByShopAsc(Card card);
 
+    List<DailyCardInfo> deleteByCard(Card card);
+
+
     @Query("select d from DailyCardInfo d where d.card.id = ?1 order by d.shop ASC, d.day ASC")
     List<DailyCardInfo> findByCardIdOrderByShopAndDayAsc(String id); //not work properly
 //    List<DailyCardInfo> findByCardAndShopOrderByDay(Card card, CardShop shop);

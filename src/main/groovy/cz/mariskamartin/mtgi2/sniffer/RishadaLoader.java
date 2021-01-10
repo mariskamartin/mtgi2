@@ -69,7 +69,7 @@ public class RishadaLoader implements ISniffer {
         if (edition == null) edition = "1000000";
         if (findString == null) findString = "";
         String urlRequest = "http://www.rishada.cz/kusovky/vysledky-hledani?searchtype=basic&xxwhichpage=1&xxcardname="+findString.replace(" ", "+")+"&xxedition="+edition+"&xxpagesize=10000&search=Vyhledat";
-        Document doc = Jsoup.connect(urlRequest).validateTLSCertificates(true).ignoreHttpErrors(true).followRedirects(true).timeout(10000).get();
+        Document doc = Jsoup.connect(urlRequest).ignoreHttpErrors(true).followRedirects(true).timeout(10000).get();
 //        Document doc = Jsoup.parse(new File("/Users/martinmariska/rishada.html"), "utf-8");
         return doc;
     }

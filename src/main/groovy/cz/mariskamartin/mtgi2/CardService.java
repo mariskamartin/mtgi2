@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -158,10 +159,12 @@ public class CardService {
             log.trace("{}", d.toString());
             if (dBefore != null) {
                 if (d.getShop().equals(dBefore.getShop())) {
-                    //logika pro smazani
-                    if (d.getPrice().equals(dBefore.getPrice())) {
+                    // TODO create test for this algorithm
+                    if (d.getPrice().equals(dBefore.getPrice())
+                            && d.getStoreAmount() == dBefore.getStoreAmount()) {
                         if (!change) {
                             //smaz dci
+//                            log.debug("added for delete {}", dBefore);
                             deleteDci.add(dBefore);
                         }
                         change = false;
@@ -189,4 +192,16 @@ public class CardService {
         }
     }
 
+    public Collection<Card> findCardByEdition(CardEdition edition) {
+        return cardRepository.findByEdition(edition);
+    }
+
+    @Transactional
+    public List<Card> deleteCardAndDciById(String cardId) {
+        List<DailyCardInfo> deletedDailyCardInfos = dailyCardInfoRepository.deleteByCard(new Card(cardId));
+        log.debug("deleted dcis: {}", deletedDailyCardInfos);
+        List<Card> deletedCards = cardRepository.removeById(cardId);
+        log.debug("deleted cards: {}", deletedCards);
+        return deletedCards;
+    }
 }

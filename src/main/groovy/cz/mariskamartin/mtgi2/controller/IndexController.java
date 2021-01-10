@@ -102,17 +102,26 @@ public class IndexController {
         return card;
     }
 
-    @GetMapping("/cards/detail/**")
+    @GetMapping("/cards/detail/card-id/**")
     public Card getCard(HttpServletRequest request) throws UnsupportedEncodingException {
-        String cardId = getCardIdFromLastEncodedPath(request, "/cards/detail/");
+        String cardId = getCardIdFromLastEncodedPath(request, "/cards/detail/card-id/");
         Optional<Card> card = cardRepository.findById(cardId);
         log.info("get card = {}", card);
         return card.get();
     }
 
-    @GetMapping("/dci/detail/**")
+    @DeleteMapping("/cards/detail/card-id/**")
+    public List<Card> deleteCard(HttpServletRequest request) throws UnsupportedEncodingException {
+        String cardId = getCardIdFromLastEncodedPath(request, "/cards/detail/card-id/");
+        List<Card> cards = cardService.deleteCardAndDciById(cardId);
+        log.info("deleted cards = {}", cards);
+        return cards;
+    }
+
+
+    @GetMapping("/dci/detail/card-id/**")
     public List<DailyCardInfo> getDciForCard(HttpServletRequest request) throws UnsupportedEncodingException {
-        String cardId = getCardIdFromLastEncodedPath(request, "/dci/detail/");
+        String cardId = getCardIdFromLastEncodedPath(request, "/dci/detail/card-id/");
         List<DailyCardInfo> dciList = dailyCardInfoRepository.findByCard(new Card(cardId));
         return dciList;
     }
@@ -139,13 +148,24 @@ public class IndexController {
         return cards;
     }
 
+    @GetMapping("/dci/clean/card-id/**")
+    public boolean cleanDciForCard(HttpServletRequest request) throws UnsupportedEncodingException {
+        String cardId = getCardIdFromLastEncodedPath(request, "/dci/clean/card-id/");
+        cardService.cleanCardsDailyCardInfoById(cardId);
+        return true;
+    }
+
+    @RequestMapping(value = "/cards/find/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Collection<Card> findCardsByEdition(@PathVariable("name") String name) throws IOException {
+        return cardService.findCardByEdition(CardEdition.valueFromName(name));
+    }
+
     @RequestMapping(value = "/dci/fetch/edition/{name}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Collection<Card> fetchDciByEdition(@PathVariable("name") String name) throws IOException {
         List<DailyCardInfo> dcis = cardService.fetchCardsByEdition(CardEdition.valueFromName(name));
         Collection<Card> cards = cardService.saveCardsIntoDb(dcis);
         return cards;
     }
-
 
     @RequestMapping(value = "/dci/test", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Collection<Card> dciTest() throws IOException, InterruptedException {

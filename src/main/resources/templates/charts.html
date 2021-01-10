@@ -11,9 +11,15 @@
     <title>MTG Inventory v2.0.0</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <!-- fonts https://fontawesome.com/icons/shield-alt?style=solid -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
     <!-- Custom styles for this template -->
+<!--
     <link href="/lib/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+-->
+    <link href="/lib/bootstrap/css/bootstrap-mtgi.css" rel="stylesheet">
     <!-- Load c3.css -->
     <link href="/lib/c3/c3.min.css" rel="stylesheet" type="text/css">
     <!-- Load pnotify.css -->
@@ -27,57 +33,81 @@
         <div class="col-md-12">
             <form id="cards-form1">
                 <div class="form-group">
-                    <label for="findInput">Card:</label>
-                    <input placeholder="card name?" id="findInput"/>
-                    <button id="findCardButton" type="button" class="btn btn-success btn-sm">Find card</button>
-                    <button id="fetchCardButton" type="button" class="btn btn-info btn-sm">Fetch card from shops</button>
-                    <button id="cleanCardDciButton" type="button" class="btn btn-warning btn-sm">Clean card dci</button>
-                    <br />
-                    <label for="editionInput">Edition:</label>
-                    <input placeholder="edition name?" id="editionInput"/>
-                    <button id="fetchEditionButton" type="button" class="btn btn-info btn-sm">Fetch by edition</button>
+                    <label for="findInput">Karta:<i class="fas fa-info-circle mm-padded" data-bs-toggle="tooltip" title="'Hledej' dohledá kartu v lokalní databázi a zobrazí tabulku s výsledky. 'Aktualizuj' se pokusí přečíst aktuální hodnoty z českých MTG obchodů pro další zobrazení v grafu karty."></i></label>
+                    <input placeholder="hledany nazev?" id="findInput"/>
+                    <button id="findCardButton" type="button" class="btn btn-success btn-sm">Hledej</button>
+                    <button id="fetchCardButton" type="button" class="btn btn-info btn-sm">Aktualizuj</button>
+                    <button id="cleanCardDciButton" type="button" class="btn btn-default btn-sm">Vycisti Historii</button>
+                </div>
+            </form>
+            <form id="cards-form2">
+                <div class="form-group">
+                    <label for="editionInput">Edice:<i class="fas fa-info-circle mm-padded" data-bs-toggle="tooltip" title="'Hledej' dohledá všechny karty v lokalní databázi dle Edice a zobrazí tabulku s výsledky."></i></label>
+                    <input placeholder="nazev edice presne?" id="editionInput"/>
+                    <button id="findEditionButton" type="button" class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="'Hledej' dohledá karty z celé Edice v lokalní databázi a zobrazí tabulku s výsledky.">Hledej</button>
+                    <button id="fetchEditionButton" type="button" class="btn btn-info btn-sm">Aktualizuj</button>
                 </div>
             </form>
         </div>
         <div class="col-md-12">
-            <button id="fetchManagedCards" type="button" class="btn btn-info btn-sm">Fetch all Managed</button>
+            <form id="cards-form3">
+                <div class="form-group">
+                    <label for="editionInput">Maintanace:</label>
+                    <button id="fetchManagedCards" type="button" class="btn btn-default btn-sm">Aktualizovat Managed Karty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <i class="fas fa-info-circle mm-padded" data-bs-toggle="tooltip" title="Tabulka výsledků karet obsahuje poslední sloupec akce, kde je možné si zobrazit konkrétní graf s historií cen a skladové dostupnosti."></i>
         </div>
         <div class="col-md-12">
             <div id="cards-table1" class="table-responsive">
-                <table class="table table-striped table-condensed table-bordered center-table">
+                <table class="table mm-table table-sm table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th>Card</th>
-                        <th>ID</th>
-                        <th>img</th>
+                        <th class="d-none d-sm-table-cell">Karta</th>
+                        <th>ID (nazev|foil|rarita|edice)</th>
+                        <th>Akce</th>
                     </tr>
                     </thead>
                     <tbody id="cards-tbody1">
-                    <!--<tr>-->
-                        <!--<td>Some card</td>-->
-                        <!--<td>Some ID</td>-->
-                    <!--</tr>-->
+<!--
+                    <tr>
+                        <td class="d-none d-sm-table-cell">card name</td>
+                        <td>IDofCard</td>
+                        <td>actions</td>
+                    </tr>
+                    <tr><td class="d-none d-sm-table-cell">Pendelhaven</td><td>Pendelhaven|false|RARE|A25</td><td><button class="btn btn-xs mm-icon-btn" onclick="pageViewModel.tableImgClick('1')"><span class="fas fa-chart-line"></span></button><button class="btn btn-xs mm-icon-btn" onclick="pageViewModel.tableStarClick('1')"><i class="fas fa-broom"></i></button></td></tr>
+                    <tr><td class="d-none d-sm-table-cell">Pendelhaven</td><td>Pendelhaven|false|RARE|A25</td><td><button class="btn btn-xs" onclick="pageViewModel.tableImgClick('1')"><span class="fas fa-chart-line mm-icon-btn"></span></button><button class="btn btn-xs" onclick="pageViewModel.tableStarClick('1')"><i class="fas fa-broom mm-icon-btn"></i></button></td></tr><!--
+-->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+<!--
     <div class="row">
+    </div>
+-->
+    <div id="charts"></div>
         <!--<h1>Charts</h1>-->
         <!--<div id="cardDetail" class="col-md-12">-->
             <!--<h1>Card price history</h1>-->
             <!--<div id="priceChart"></div>-->
         <!--</div>-->
-        <div id="charts"></div>
-    </div>
 </div>
 <!-- /.container -->
 
 
 <!-- Placed at the end of the document so the pages load faster -->
-<script type='text/javascript' src="/lib/jquery-1.8.3.js"></script>
-<script type='text/javascript' src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 <script type='text/javascript' src="/lib/pnotify/pnotify.custom.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js" integrity="sha512-PQsdzDthPKtp230uD7lunTQw6CwNTPnd5LP3e3/+afg9cNkrL7UsfWXT3EW5Ar9XZ5SdADcPDXs1BAWNa9OZ7Q==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/md5.min.js" integrity="sha512-VLDQac8zlryHkFvL1HIH9KKjkPNdsNLEXM/vImKGMaNkEXbNtb+dyhnyXFkxai1RVNtwrD5L7vffgtzYzeKI3A==" crossorigin="anonymous"></script>
 
 <!-- Load d3.js and c3.v0.7.20.js -->
 <script src="/lib/c3/d3.v5.min.js" charset="utf-8"></script>
@@ -142,37 +172,46 @@ function CardMovement(pojo) {
 // MVVM for this html
 function PageViewModel () {
     var self = this;
+    self.isAdmin = false;
+
+    self.evaluateAdminPwd = function() {
+        var url = new URL(document.URL);
+        self.isAdmin = (CryptoJS.MD5("admin:"+url.searchParams.get("admin")).toString() == '75e7109aa7f34c90eda0721057ad060e');
+    }
 
     self.populateCardDetail = function(card) {
         utils.json.get({
-            url : '/rest/dci/detail/' + encodeURI(card.id).replace("#","%23"),
+            url : '/rest/dci/detail/card-id/' + encodeURI(card.id).replace("#","%23"),
             success : function(result) {
                 console.log(["fetch dcis", this, result]);
                 // var chartId = "pc-1";
-                var encCardId = card.id.replaceAll("/","_").replaceAll("´","_").replaceAll("'","").replaceAll("(","").replaceAll(")","").replaceAll("#","").split('|').join('').split(' ').join('').split(',').join('');
+                var encCardId = card.id.replaceAll(".","_").replaceAll("/","_").replaceAll("´","_").replaceAll("'","").replaceAll("(","").replaceAll(")","").replaceAll("#","").replaceAll("ř","r").replaceAll("í","i").replaceAll("ě","e").replaceAll("á","a").split('|').join('').split(' ').join('').split(',').join('');
 //                var encCardId = card.id.replaceAll(/[\/|,'´()#] /g,"_")
                 var chartId = "pc-" + encCardId;
                 var divId = "div-" + encCardId;
 
                 //when not exists
                 if ( $('#' + chartId).length === 0) {
-                    $( "#charts" ).append( "<div class=\"col-md-12\" id=\""+divId+"\"><h1>"+card.id+"<button type=\"button\" class=\"close\" aria-label=\"Close\" onclick=\"$('#"+divId+"').remove()\"><span aria-hidden=\"true\">×</span></button></h1><div id=\"" + chartId + "\"></div></div>" );
+                    $( "#charts" ).append( "<div class=\"row\"><div class=\"col-md-12\" id=\""+divId+"\"><h1>"+card.id+"<button type=\"button\" class=\"close\" aria-label=\"Close\" onclick=\"$('#"+divId+"').remove()\"><span aria-hidden=\"true\">×</span></button></h1><div id=\"" + chartId + "\"></div></div></div>" );
                 }
 
                 var data = {};
                 result.forEach(function(item) {
                     data[item.shop] = data[item.shop] || {
-                        x : [ 'x'+item.shop ],
                         xs : {},
-                        values : [ item.shop ]
+                        names : {},
+                        x : [ 'x'+item.shop ],
+                        prices : [ item.shop ],
+                        store : [ 'ks'+item.shop ]
                     };
-                    data[item.shop].xs[item.shop] = data[item.shop].x[0];
-                    // console.log(data);
+                    data[item.shop].xs[item.shop] = 'x'+item.shop; // map prices to x values
+                    data[item.shop].xs['ks'+item.shop] = 'x'+item.shop; // map store amount to x values
+                    data[item.shop].names['ks'+item.shop] = item.shop+' ks'; // rename id of store to nice name
                     data[item.shop].x.push(item.dayTxt);
-                    data[item.shop].values.push(item.price);
-                    data[item.shop].storeDay = item.dayTxt;
-                    data[item.shop].storeAmount = item.storeAmount;
+                    data[item.shop].prices.push(item.price);
+                    data[item.shop].store.push(item.storeAmount);
                 });
+                console.log(["result", result, "data", data]);
 
                 var chart = c3.generate({
                     bindto: '#' + chartId,
@@ -184,36 +223,39 @@ function PageViewModel () {
                         x : {
                             type : 'timeseries',
                             tick : {
+                                rotate: 90,
                                 format : '%d.%m.%Y'
                             }
                         }
                     },
                     transition: {
-                        duration: 150
+                        duration: 200
+                    },
+                    tooltip: {
+                        format: {
+                            value: function myFunc(value, ratio, id, index) {
+                                return (id.startsWith('ks')) ? value+' ks' : value+',-';
+                            }
+                        }
                     }
                 });
 
-                // var txtSkladem = self.cardDetail().storeAmount() ? "<br />" : "";
                 for ( var shop in data) {
-                    // txtSkladem = txtSkladem ? txtSkladem + "<br />" : txtSkladem;
-                    // txtSkladem = txtSkladem + data[shop].storeDay + " - " + shop + " - " + data[shop].storeAmount + " ks";
-
                     chart.load({
                         xs : data[shop].xs,
-                        columns : [ data[shop].x, data[shop].values ]
+                        names : data[shop].names,
+                        columns : [ data[shop].x, data[shop].prices, data[shop].store ]
                     });
                 }
-                // self.cardDetail().storeAmount(txtSkladem);
                 // document.getElementById("cardDetail").scrollIntoView(true);
             }
         });
     };
 
     self.tableImgClick = function(cardIndex){
-        var cardId = self.cardTableMap[cardIndex]
-        var encodedCardId = encodeURI(cardId)
+        var cardId = self.cardTableMap[cardIndex].id
         utils.json.get({
-            url : '/rest/cards/detail/' + encodeURI(cardId).replace("#","%23"),
+            url : '/rest/cards/detail/card-id/' + encodeURI(cardId).replace("#","%23"),
             success : function(result) {
                 console.log(["get card",this, result]);
                 pageViewModel.populateCardDetail(new Card(result));
@@ -222,13 +264,21 @@ function PageViewModel () {
     };
 
     self.tableStarClick = function(cardIndex){
-        var cardId = self.cardTableMap[cardIndex]
-        console.log("star: " + cardId);
+        var cardId = self.cardTableMap[cardIndex].id
         utils.json.get({
-            // this will not work when card contains //
-            url : '/rest/cards/clean-dci/'+encodeURI(cardId).replace("#","%23"),
+            url : '/rest/dci/clean/card-id/'+encodeURI(cardId).replace("#","%23"),
             success : function(result) {
-                utils.msg.info("done celaning");
+                utils.msg.info("done celaning: " + result);
+            }
+        });
+    };
+
+    self.tableTrashClick = function(cardIndex){
+        var cardId = self.cardTableMap[cardIndex].id
+        utils.json.del({
+            url : '/rest/cards/detail/card-id/' + encodeURI(cardId).replace("#","%23"),
+            success : function(result) {
+                utils.msg.info("deleted cards: " + JSON.stringify(result));
             }
         });
     };
@@ -243,15 +293,13 @@ function PageViewModel () {
         cardsPojo.forEach(function(item) {
             var c = new Card(item);
             //store correct card ID for later use
-            self.cardTableMap[++i] = c.id
-            tbody.append( "<tr><td>"+c.name+"</td><td>"+c.id+"</td><td>" +
-                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableImgClick('"+i+"')\"><span class=\"glyphicon glyphicon-picture\"></span></button>" +
-                "<button class=\"btn btn-xs\" onclick=\"pageViewModel.tableStarClick('"+i+"')\"><span class=\"glyphicon glyphicon-star\"></span></button>" +
-                "</td></tr>" );
+            self.cardTableMap[++i] = c
 
-            // $("div#cards-table1 > table > tbody > tr").click(function() {
-            // var cardId = $(this).find("td").eq(1).html();
-            // });
+            var buttons = "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableImgClick('"+i+"')\"><span class=\"fas fa-chart-line\"></span></button>"
+            buttons += "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableStarClick('"+i+"')\"><i class=\"fas fa-broom\"></i></button>"
+            if (self.isAdmin) buttons += "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableTrashClick('"+i+"')\"><i class=\"fas fa-trash-alt\"></i></button>"
+
+            tbody.append( "<tr><td class=\"d-none d-sm-table-cell\">"+c.name+"</td><td>"+c.id+"</td><td>" + buttons + "</td></tr>" );
         });
     }
 }
@@ -262,6 +310,13 @@ var pageViewModel = new PageViewModel();
 $( document ).ready(function() {
     console.log( "ready!" );
     // pageViewModel.afterRenderActiveTemplate(document, pageViewModel);
+    pageViewModel.evaluateAdminPwd();
+
+    // activate all bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 });
 
 $( "#findCardButton" ).click(function() {
@@ -276,6 +331,14 @@ $( "#findCardButton" ).click(function() {
         }
     });
 });
+
+$( "#findInput" ).on('keypress',function(e) {
+    if(e.which == 13) {
+        e.preventDefault();
+        $("#findCardButton").click();
+    }
+})
+
 
 $( "#fetchCardButton" ).click(function(e) {
     e.preventDefault();
@@ -292,6 +355,17 @@ $( "#fetchCardButton" ).click(function(e) {
             // self.cards.push(new Card(item));
             // });
             // pageViewModel.populateCardDetail(new Card(result[0]));
+        }
+    });
+});
+
+$( "#findEditionButton" ).click(function() {
+    var text = $('#editionInput').val();
+    utils.json.get({
+        url : '/rest/cards/find/edition/' + text,
+        success : function(result) {
+            console.log(["find cards by edition", this, result]);
+            pageViewModel.populateCardTable(result);
         }
     });
 });

@@ -1,0 +1,14 @@
+.mm-padded {
+  padding: .3rem;
+}
+
+.mm-table td {}
+
+.btn-default {
+    border-color: black;
+}
+
+.mm-icon-btn {
+  padding: .1rem !important;
+}
+
