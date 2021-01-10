@@ -79,6 +79,7 @@ public class TolarieLoader implements ISniffer {
                 Elements innerValues = element.children();
                 long skladem = Utils.parseLong(innerValues.get(0).text().replaceAll(".*skladem (\\d+).*","$1"), 0);
                 long cena = Utils.parseLong(innerValues.get(6).text().replaceAll("(\\d+).*","$1"), 0);
+                if (cena <= 0) continue;
                 DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.TOLARIE);
                 builder.add(dci);
             } catch (Exception e) {

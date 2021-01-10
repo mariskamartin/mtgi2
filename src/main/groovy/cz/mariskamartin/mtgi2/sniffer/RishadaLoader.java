@@ -57,6 +57,7 @@ public class RishadaLoader implements ISniffer {
                 Elements innerValues = element.children();
                 long skladem = Utils.parseLong(innerValues.get(8).text(), 0);
                 long cena = Utils.parseLong(innerValues.get(7).text().replace(HTML_NBSP, "").replace("Kč", "").trim(), 0);
+                if (cena <= 0) continue;
                 DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.RISHADA);
                 builder.add(dci);
             } catch (NumberFormatException e) {

@@ -76,7 +76,7 @@ public class CernyRytirLoader implements ISniffer {
                 long skladem = Utils.parseLong(select2.get(0).html().replace("&nbsp;", "").replace("ks", ""), 0);
                 String[] val = select2.get(1).html().split("&nbsp;");
                 long cena = Utils.parseLong(val[0], 0);
-
+                if (cena <= 0) continue;
                 DailyCardInfo dci = new DailyCardInfo(card, BigDecimal.valueOf(cena), skladem, new Date(), CardShop.CERNY_RYTIR);
                 builder.add(dci);
             }
