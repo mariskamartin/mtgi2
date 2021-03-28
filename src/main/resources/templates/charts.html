@@ -49,13 +49,16 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-12">
+        <div id="maintenance" class="d-none">
+            <div class="col-md-12">
             <form id="cards-form3">
                 <div class="form-group">
-                    <label for="editionInput">Maintanace:</label>
+                    <label for="editionInput">Maintenance:</label>
                     <button id="fetchManagedCards" type="button" class="btn btn-default btn-sm">Aktualizovat Managed Karty</button>
+                    <button id="cleanAllDciHistory" type="button" class="btn btn-default btn-sm">Clean All DCIs</button>
                 </div>
             </form>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -80,7 +83,7 @@
                         <td>actions</td>
                     </tr>
                     <tr><td class="d-none d-sm-table-cell">Pendelhaven</td><td>Pendelhaven|false|RARE|A25</td><td><button class="btn btn-xs mm-icon-btn" onclick="pageViewModel.tableImgClick('1')"><span class="fas fa-chart-line"></span></button><button class="btn btn-xs mm-icon-btn" onclick="pageViewModel.tableStarClick('1')"><i class="fas fa-broom"></i></button></td></tr>
-                    <tr><td class="d-none d-sm-table-cell">Pendelhaven</td><td>Pendelhaven|false|RARE|A25</td><td><button class="btn btn-xs" onclick="pageViewModel.tableImgClick('1')"><span class="fas fa-chart-line mm-icon-btn"></span></button><button class="btn btn-xs" onclick="pageViewModel.tableStarClick('1')"><i class="fas fa-broom mm-icon-btn"></i></button></td></tr><!--
+                    <tr><td class="d-none d-sm-table-cell">Pendelhaven</td><td>Pendelhaven|false|RARE|A25</td><td><button class="btn btn-xs" onclick="pageViewModel.tableImgClick('1')"><span class="fas fa-chart-line mm-icon-btn"></span></button><button class="btn btn-xs" onclick="pageViewModel.tableStarClick('1')"><i class="fas fa-broom mm-icon-btn"></i></button></td></tr>
 -->
                     </tbody>
                 </table>
@@ -172,11 +175,12 @@ function CardMovement(pojo) {
 // MVVM for this html
 function PageViewModel () {
     var self = this;
-    self.isAdmin = false;
+    self.isa = false;
 
     self.evaluateAdminPwd = function() {
         var url = new URL(document.URL);
-        self.isAdmin = (CryptoJS.MD5("admin:"+url.searchParams.get("admin")).toString() == '75e7109aa7f34c90eda0721057ad060e');
+        self.isa = (CryptoJS.MD5("admin:"+url.searchParams.get("admin")).toString() == '75e7109aa7f34c90eda0721057ad060e');
+        if(self.isa) $("#maintenance").removeClass("d-none")
     }
 
     self.populateCardDetail = function(card) {
@@ -184,7 +188,6 @@ function PageViewModel () {
             url : '/rest/dci/detail/card-id/' + encodeURI(card.id).replace("#","%23"),
             success : function(result) {
                 console.log(["fetch dcis", this, result]);
-                // var chartId = "pc-1";
                 var encCardId = card.id.replaceAll(".","_").replaceAll("/","_").replaceAll("´","_").replaceAll("'","").replaceAll("(","").replaceAll(")","").replaceAll("#","").replaceAll("ř","r").replaceAll("í","i").replaceAll("ě","e").replaceAll("á","a").split('|').join('').split(' ').join('').split(',').join('');
 //                var encCardId = card.id.replaceAll(/[\/|,'´()#] /g,"_")
                 var chartId = "pc-" + encCardId;
@@ -192,7 +195,14 @@ function PageViewModel () {
 
                 //when not exists
                 if ( $('#' + chartId).length === 0) {
-                    $( "#charts" ).append( "<div class=\"row\"><div class=\"col-md-12\" id=\""+divId+"\"><h1>"+card.id+"<button type=\"button\" class=\"close\" aria-label=\"Close\" onclick=\"$('#"+divId+"').remove()\"><span aria-hidden=\"true\">×</span></button></h1><div id=\"" + chartId + "\"></div></div></div>" );
+                    var cardIdFixed = card.id.replace("|"," ");
+                    $( "#charts" ).append( "<div class=\"row\" id=\""+divId+"\">" +
+                        "<div class=\"col\" ><h1>"+cardIdFixed+"</h1></div>" +
+                        "<div class=\"col-1\"><button type=\"button\" class=\"close\" aria-label=\"Close\" onclick=\"$('#"+divId+"').remove()\"><span aria-hidden=\"true\">×</span></button></div>" +
+                        "<div class=\"col-md-12\"><div id=\"" + chartId + "\"></div></div>" +
+                        "</div>" +
+
+                    "</div>" );
                 }
 
                 var data = {};
@@ -268,7 +278,7 @@ function PageViewModel () {
         utils.json.get({
             url : '/rest/dci/clean/card-id/'+encodeURI(cardId).replace("#","%23"),
             success : function(result) {
-                utils.msg.info("done celaning: " + result);
+                utils.msg.info("done cleaning: " + result);
             }
         });
     };
@@ -293,13 +303,13 @@ function PageViewModel () {
         cardsPojo.forEach(function(item) {
             var c = new Card(item);
             //store correct card ID for later use
-            self.cardTableMap[++i] = c
-
+            self.cardTableMap[++i] = c;
             var buttons = "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableImgClick('"+i+"')\"><span class=\"fas fa-chart-line\"></span></button>"
             buttons += "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableStarClick('"+i+"')\"><i class=\"fas fa-broom\"></i></button>"
-            if (self.isAdmin) buttons += "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableTrashClick('"+i+"')\"><i class=\"fas fa-trash-alt\"></i></button>"
+            if (self.isa) buttons += "<button class=\"btn btn-xs mm-icon-btn\" onclick=\"pageViewModel.tableTrashClick('"+i+"')\"><i class=\"fas fa-trash-alt\"></i></button>"
 
-            tbody.append( "<tr><td class=\"d-none d-sm-table-cell\">"+c.name+"</td><td>"+c.id+"</td><td>" + buttons + "</td></tr>" );
+            var cardIdFixed = c.id.replace("|"," ");
+            tbody.append( "<tr><td class=\"d-none d-sm-table-cell\">"+c.name+"</td><td>"+cardIdFixed+"</td><td>" + buttons + "</td></tr>" );
         });
     }
 }
@@ -392,6 +402,15 @@ $("#fetchManagedCards").click(function() {
         url : '/rest/cards/fetch/managed/',
         success : function(result) {
             utils.msg.info("done loading managed cards");
+        }
+    });
+});
+
+$("#cleanAllDciHistory").click(function() {
+    utils.json.get({
+        url : '/rest/dci/clean-all',
+        success : function(result) {
+            utils.msg.info("done cleaning all DCIs: " + result);
         }
     });
 });

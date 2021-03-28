@@ -22,6 +22,9 @@ public enum ManagedCardEditions {
         add(CardEdition.KALDHEIM, null, null);
         add(CardEdition.KHE, null, null);
 
+        add(CardEdition.AETHER_REVOLT, "edition_Aether_Revolt","173");
+        add(CardEdition.MAGIC_ORIGINS, "edition_Magic_Origins","17");
+
         add(CardEdition.RAVNICA_ALLEGIANCE, "edition_RNA","180");
         add(CardEdition.GUILDS_OF_RAVNICA, "edition_GRN","179");
         add(CardEdition.KHANS_OF_TARKIR, "edition_Khans_of_Tarkir","165");
