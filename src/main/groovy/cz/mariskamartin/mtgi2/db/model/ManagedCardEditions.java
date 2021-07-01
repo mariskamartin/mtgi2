@@ -19,6 +19,11 @@ public enum ManagedCardEditions {
     private Map<CardEdition, EditionInfo> managedEditions = Maps.newHashMap();
 
     ManagedCardEditions() {
+        add(CardEdition.STX, null, null);
+        add(CardEdition.STE, null, null);
+        add(CardEdition.TSF, null, null);
+        add(CardEdition.TSR, null, null);
+
         add(CardEdition.KALDHEIM, null, null);
         add(CardEdition.KHE, null, null);
 
@@ -29,6 +34,8 @@ public enum ManagedCardEditions {
         add(CardEdition.GUILDS_OF_RAVNICA, "edition_GRN","179");
         add(CardEdition.KHANS_OF_TARKIR, "edition_Khans_of_Tarkir","165");
 
+        add(CardEdition.MODERN_HORIZONS, null,null);
+        add(CardEdition.DOUBLE_MASTERS, null,null);
         add(CardEdition.MODERN_MASTERS_2017, "edition_vanoce",null);
         add(CardEdition.MODERN_MASTERS, "edition_Modern_Masters",null);
         add(CardEdition.MODERN_MASTERS_2015, "edition_Modern_Masters_2015",null);

@@ -1,5 +1,7 @@
 package cz.mariskamartin.mtgi2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,10 +10,13 @@ import java.util.concurrent.Executors;
 
 @Configuration
 public class ExecutorServiceConfig {
+    private static final Logger log = LoggerFactory.getLogger(ExecutorServiceConfig.class);
 
     @Bean("fixedThreadPool")
     public ExecutorService fixedThreadPool() {
-        return Executors.newFixedThreadPool(4);
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        log.info("Thread pool availableProcessors = {}", availableProcessors);
+        return Executors.newFixedThreadPool(availableProcessors);
     }
 
 //    @Bean("singleThreaded")
